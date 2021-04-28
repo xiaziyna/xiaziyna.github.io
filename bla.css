@@ -57,16 +57,4 @@ h1, h2, h3, h4, h5, h6 {
     float: right;
     margin: 0 0 .5em 1em;
   }
-  .title{
-    background-color: white;
-    color: black;
-    width: 680px;
-    display: inline-flex;
-}
-
-.logo{
-    width: 100px;
-    height: 100px;
-    float: right;
-}
 }
