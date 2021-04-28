@@ -59,7 +59,7 @@ h1, h2, h3, h4, h5, h6 {
   }
   .header img {
   float: left;
-  top: 18px;
+  top: 15px;
   width: 319px;
   height: 376px;
   background: #555;
@@ -67,7 +67,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .header h1 {
   position: right;
-  top: 18px;
+  top: 20px;
   left: 0px;
 }
 }
