@@ -59,8 +59,8 @@ h1, h2, h3, h4, h5, h6 {
   }
   .header img {
   float: left;
-  width: 100px;
-  height: 100px;
+  width: 255px;
+  height: 301px;
   background: #555;
 }
 
