@@ -65,7 +65,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .header h1 {
-  position: relative;
+  position: right;
   top: 18px;
   left: 0px;
 }
