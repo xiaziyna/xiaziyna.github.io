@@ -11,7 +11,6 @@
   <meta property="og:image" content="mee.jpg" />
   <link rel="stylesheet" href="bla.css" />
   <style>
-    /* Minimal additions; move to bla.css later */
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.55;color:#111}
     .container{max-width:820px;margin:0 auto;padding:0 1rem}
     .topnav{position:sticky;top:0;background:#fff;border-bottom:1px solid #eee;z-index:10}
@@ -24,12 +23,10 @@
     .cta{margin:.75rem 0 0 0;display:flex;gap:.6rem;flex-wrap:wrap}
     .btn{display:inline-block;padding:.6rem 1rem;border:1px solid #000;text-decoration:none}
     .btn:hover{background:#000;color:#fff}
-    .btn-secondary{display:inline-block;padding:.6rem 1rem;text-decoration:none;opacity:.85}
     h2{margin-top:2rem}
     ul.pubs, ul.projects{list-style:none;padding-left:0}
     ul.pubs li, ul.projects li{margin:.6rem 0}
     .yr{display:inline-block;min-width:3ch;font-variant-numeric:tabular-nums;color:#555}
-    .summary{background:#fafafa;border:1px solid #eee;padding:1rem;border-radius:8px}
     footer{margin:2rem 0 3rem}
     @media (max-width:600px){.header img{float:none;margin:1rem 0 0 0;width:120px;height:120px}}
   </style>
@@ -61,20 +58,15 @@
       Before Illinois, I completed an MSc in Astrophysics at
       <a href="https://www.royalholloway.ac.uk/">Royal Holloway, University of London</a>.
     </p>
+    <!-- Single CV button only -->
     <p class="cta">
       <a class="btn" href="Jamila_CV.pdf">Download CV (PDF)</a>
-      <a class="btn-secondary" href="#publications">Jump to Publications</a>
     </p>
+    <!-- Research one-liner immediately after About -->
+    <p>Research: joint detection in transit photometry, sub-µas astrometry for stellar-surface mapping, and starshade Fourier optics/digital twins for high-contrast imaging.</p>
   </header>
 
   <main class="container">
-    <section class="summary" aria-label="Research summary">
-      <h2>Research summary</h2>
-      <p>
-        Statistical signal processing for exoplanets: joint detection in transit photometry, sub-µas astrometry for stellar-surface mapping, and starshade Fourier optics/digital twins for high-contrast imaging.
-      </p>
-    </section>
-
     <hr>
 
     <section id="publications">
@@ -117,7 +109,7 @@
       <ul class="projects">
         <li>
           <a href="https://github.com/xiaziyna/PyStarshade" target="_blank">PyStarshade</a> —
-          High-resolution starshade optics simulator from source field to CCD; efficient spectral sampling and digital-twin workflows.
+          High-resolution starshade optics simulator. Utilizes the B-FFT to efficiently move through varying spatial scales.
         </li>
         <li>
           <a href="https://github.com/xiaziyna/spatial-detrend" target="_blank">Spatial-detrend</a> —
@@ -157,13 +149,8 @@
     <section id="contact">
       <h2>Contact</h2>
       <p>Email: <a href="mailto:xiaziyna@gmail.com">xiaziyna@gmail.com</a> · <a href="mailto:tjamila@umich.edu">tjamila@umich.edu</a></p>
-      <p><a href="Jamila_CV.pdf">CV (PDF)</a></p>
     </section>
   </main>
 
-  <footer class="container">
-    <hr>
-    <p>Last updated: Oct 2025 · <a href="Jamila_CV.pdf">CV (PDF)</a></p>
-  </footer>
 </body>
 </html>
