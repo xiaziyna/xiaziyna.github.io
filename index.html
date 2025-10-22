@@ -1,56 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	        <meta name="google-site-verification" content="f5THJ7_Vj5p_7kY1gBx-r7dpL771oLGP13bdGP1QQu4" />
-  		<title>xiaziyna</title>
-		<link rel="stylesheet" type="text/css" href="bla.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="google-site-verification" content="f5THJ7_Vj5p_7kY1gBx-r7dpL771oLGP13bdGP1QQu4" />
+  <title>Jamila Taaki — Astrophysics & Signal Processing</title>
+  <meta name="description" content="Statistical inference & computational imaging for exoplanets: transits, starshades, and astrometry." />
+  <meta property="og:title" content="Jamila Taaki" />
+  <meta property="og:description" content="Exoplanet inference, starshade optics, astrometry." />
+  <meta property="og:image" content="mee.jpg" />
+  <link rel="stylesheet" href="bla.css" />
+  <style>
+    /* Minimal additions; move to bla.css later */
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.55;color:#111}
+    .container{max-width:820px;margin:0 auto;padding:0 1rem}
+    .topnav{position:sticky;top:0;background:#fff;border-bottom:1px solid #eee;z-index:10}
+    .topnav .container{display:flex;gap:1rem;align-items:center;padding:.6rem 1rem}
+    .topnav a{text-decoration:none;color:#111}
+    .topnav a:hover{text-decoration:underline}
+    .header{padding:2rem 0}
+    .header img{float:right;border-radius:12px;margin-left:1rem;width:180px;height:180px;object-fit:cover}
+    .tagline{margin-top:-.25rem;color:#444}
+    .cta{margin:.75rem 0 0 0;display:flex;gap:.6rem;flex-wrap:wrap}
+    .btn{display:inline-block;padding:.6rem 1rem;border:1px solid #000;text-decoration:none}
+    .btn:hover{background:#000;color:#fff}
+    .btn-secondary{display:inline-block;padding:.6rem 1rem;text-decoration:none;opacity:.85}
+    h2{margin-top:2rem}
+    ul.pubs, ul.projects{list-style:none;padding-left:0}
+    ul.pubs li, ul.projects li{margin:.6rem 0}
+    .yr{display:inline-block;min-width:3ch;font-variant-numeric:tabular-nums;color:#555}
+    .summary{background:#fafafa;border:1px solid #eee;padding:1rem;border-radius:8px}
+    footer{margin:2rem 0 3rem}
+    @media (max-width:600px){.header img{float:none;margin:1rem 0 0 0;width:120px;height:120px}}
+  </style>
 </head>
 <body>
-	<div class="header">
-	<img src="mee.jpg" style="float:right" alt="logo" />
-	<h1> Jamila Taaki </h1>
-        <h2> Hello, </h2>
-	<p> I'm a Schmidt postdoctoral fellow at the Michigan Institute for Data & AI in Society (University of Michigan) where I'm mentored by <a href="https://sites.lsa.umich.edu/liacorrales/">Professor Lia Corrales (Astronomy) </a>
-		and <a href="https://hero.engin.umich.edu/">Professor Alfred Hero (EECS)</a>. I completed my PhD in <a href="https://ece.illinois.edu/">Electrical and Computer Engineering</a> at the <a href="https://illinois.edu/">University of Illinois Urbana-Champaign</a>
-	 advised by <a href="https://ece.illinois.edu/about/directory/faculty/farzadk">Professor Farzad Kamalabadi</a> (ECE) and <a href="https://astro.illinois.edu/directory/profile/akemball">Professor Athol Kemball</a> (Astronomy).</p>
-	Before joining Illinois, I completed an M.sc. in Astrophysics at <a href="https://www.royalholloway.ac.uk/">Royal Holloway University of London</a>.
-	
-	<p>
-	My research interests are focused on statistical inference and computational methods for transit photometry and direct-imaging. 
-	</div>
-	
-	<hr>
-	<h2> Publications </h2>
-	<p><a href="https://doi.org/10.21105/joss.07917">PyStarshade: Simulating High-Contrast Imaging of Exoplanets with Starshades</a>: Taaki, Kemball, Kamalabadi. Journal of Open Source Software (2025).</p>
-	<p><a href="https://doi.org/10.3847/1538-3881/add15a">A Search for Exoplanet Candidates in TESS 2 minute Light Curves Using Joint Bayesian Detection</a>: Taaki, Kemball, Kamalabadi. The Astronomical Journal (2025).</p>
-	<p><a href="https://iopscience.iop.org/article/10.3847/1538-3881/ad1110">Robust Detrending of Spatially Correlated Systematics in Kepler Light Curves Using Low-Rank Methods:</a> Taaki, Kemball, Kamalabadi. The Astronomical Journal (2024).</p>
-	<p><a href="https://iopscience.iop.org/article/10.3847/1538-3881/ab8e38/meta">Bayesian Methods for Joint Exoplanet Transit Detection and Systematic Noise Characterization:</a> Taaki, Kamalabadi, Kemball. The Astronomical Journal (2020).</p>
+  <nav class="topnav">
+    <div class="container">
+      <a href="Jamila_CV.pdf"><strong>CV (PDF)</strong></a>
+      <a href="#publications">Publications</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
 
-	<hr>
-	<h2> Projects/Software</h2>
-	<p> 
-	<a href="https://github.com/xiaziyna/PyStarshade" target="_blank">PyStarshade</a> : a Python library for optical simulation of direct exoplanet imaging with an occulter (starshade),
-		from star-planet source field to CCD. PyStarshade affords high-resolution simulation for arbitrary source fields based on efficient spectral sampling methods.  </p>	
-	<a href="https://github.com/xiaziyna/spatial-detrend" target="_blank">Spatial-detrend demo</a> : Tools to use spatially correlated systematics detrending.  </p>	
-	<p> We were awarded a <a href="bw_proposal.pdf">250k Bluewaters allocation</a> for it's final year of operations. 
-	The allocation was used to perform a search for exoplanets in years 1-3 of TESS short cadence data. 
-	This search has produced a number of exoplanet candidated listed on the <a href="https://exofop.ipac.caltech.edu/tess/view_ctoi.php">EXOFOP database</a>.</p>
-	
-	<p> Enjoy <a href="https://twitter.com/exoplanet_day"> an exoplanet </a> a day: twitter bot in collab. with  <a href="https://evan.widloski.com"> Evan Widloski</a>.</p>
+  <header class="header container">
+    <img src="mee.jpg" alt="Portrait of Jamila Taaki" loading="lazy" />
+    <h1>Jamila Taaki</h1>
+    <p class="tagline">Statistical inference & computational methods for exoplanets</p>
+    <p>
+      I’m a Schmidt Postdoctoral Fellow at the
+      <a href="https://midas.umich.edu/">Michigan Institute for Data &amp; AI in Society</a>
+      (University of Michigan), mentored by
+      <a href="https://sites.lsa.umich.edu/liacorrales/">Professor Lia Corrales (Astronomy)</a>
+      and <a href="https://hero.engin.umich.edu/">Professor Alfred Hero (EECS)</a>.
+      I completed my PhD in <a href="https://ece.illinois.edu/">Electrical and Computer Engineering</a>
+      at the <a href="https://illinois.edu/">University of Illinois Urbana–Champaign</a>, advised by
+      <a href="https://ece.illinois.edu/about/directory/faculty/farzadk">Professor Farzad Kamalabadi</a>
+      and <a href="https://astro.illinois.edu/directory/profile/akemball">Professor Athol Kemball</a>.
+      Before Illinois, I completed an MSc in Astrophysics at
+      <a href="https://www.royalholloway.ac.uk/">Royal Holloway, University of London</a>.
+    </p>
+    <p class="cta">
+      <a class="btn" href="Jamila_CV.pdf">Download CV (PDF)</a>
+      <a class="btn-secondary" href="#publications">Jump to Publications</a>
+    </p>
+  </header>
 
-	<p> Bayesian transit detection requires full-rank covariance models, see how to efficiently compute transit detection tests with  <a href="https://github.com/xiaziyna/CUDA-transit-detection"> CUDA demo here </a>.  </p>
+  <main class="container">
+    <section class="summary" aria-label="Research summary">
+      <h2>Research summary</h2>
+      <p>
+        Statistical signal processing for exoplanets: joint detection in transit photometry, sub-µas astrometry for stellar-surface mapping, and starshade Fourier optics/digital twins for high-contrast imaging.
+      </p>
+    </section>
 
-	<hr>
-	<h2> Past Research Work </h2>
-	<p><i> Open University Mars Climate Lab, supervised by <a href="http://www.open.ac.uk/people/srl89">Professor Stephen Lewis</a>. Internship and temporary researcher (2015):</i> 
-		I produced simulated entry landing and descent profiles of vehicles landing on the Mars surface under a variety of climate conditions. I also looked at seasonal ice-cap variation using Martian climate simulations.</p>
-	
-	<hr>
-	<h2> Contact, Other </h2>
-	<p>Email: <a href="mailto:xiaziyna@gmail.com">xiaziyna@gmail.com</a>, <a href="mailto:tjamila@umich.edu">tjamila@umich.edu</a></p>
-	<p> CV: <a href="Jamila_CV.pdf">PDF</a></p>
-	<!-- <p><a href="sport.html">Sport</a></p> -->
+    <hr>
 
+    <section id="publications">
+      <h2>Publications</h2>
+      <ul class="pubs">
+        <li>
+          <span class="yr">2025</span>
+          <strong>Taaki</strong>, Kemball, Kamalabadi.
+          <em>PyStarshade: Simulating High-Contrast Imaging of Exoplanets with Starshades</em>.
+          Journal of Open Source Software. <a href="https://doi.org/10.21105/joss.07917">DOI</a>
+        </li>
+        <li>
+          <span class="yr">2025</span>
+          <strong>Taaki</strong>, Kemball, Kamalabadi.
+          <em>A Search for Exoplanet Candidates in TESS 2-minute Light Curves Using Joint Bayesian Detection</em>.
+          The Astronomical Journal. <a href="https://doi.org/10.3847/1538-3881/add15a">DOI</a>
+        </li>
+        <li>
+          <span class="yr">2024</span>
+          <strong>Taaki</strong>, Kemball, Kamalabadi.
+          <em>Robust Detrending of Spatially Correlated Systematics in Kepler Light Curves Using Low-Rank Methods</em>.
+          The Astronomical Journal. <a href="https://iopscience.iop.org/article/10.3847/1538-3881/ad1110">Link</a>
+        </li>
+        <li>
+          <span class="yr">2020</span>
+          <strong>Taaki</strong>, Kamalabadi, Kemball.
+          <em>Bayesian Methods for Joint Exoplanet Transit Detection and Systematic Noise Characterisation</em>.
+          The Astronomical Journal. <a href="https://iopscience.iop.org/article/10.3847/1538-3881/ab8e38/meta">Link</a>
+        </li>
+      </ul>
+      <p>
+        Full lists: <a href="https://scholar.google.com/">Google Scholar</a> · <a href="https://orcid.org/">ORCID</a>
+      </p>
+    </section>
 
+    <hr>
+
+    <section id="projects">
+      <h2>Projects / Software</h2>
+      <ul class="projects">
+        <li>
+          <a href="https://github.com/xiaziyna/PyStarshade" target="_blank">PyStarshade</a> —
+          High-resolution starshade optics simulator from source field to CCD; efficient spectral sampling and digital-twin workflows.
+        </li>
+        <li>
+          <a href="https://github.com/xiaziyna/spatial-detrend" target="_blank">Spatial-detrend</a> —
+          Tools for spatially correlated systematics detrending.
+        </li>
+        <li>
+          <a href="https://github.com/xiaziyna/CUDA-transit-detection" target="_blank">CUDA Transit Detection</a> —
+          Efficient full-rank covariance tests for Bayesian transit detection.
+        </li>
+      </ul>
+
+      <p>
+        We were awarded a <a href="bw_proposal.pdf">250k Blue Waters allocation</a> for its final year of operations.
+        The allocation supported an exoplanet search in Years 1–3 of TESS short-cadence data, producing candidates listed on
+        the <a href="https://exofop.ipac.caltech.edu/tess/view_ctoi.php">EXOFOP database</a>.
+      </p>
+
+      <p>
+        Enjoy <a href="https://twitter.com/exoplanet_day">an exoplanet a day</a>: a Twitter bot in collaboration with
+        <a href="https://evan.widloski.com">Evan Widloski</a>.
+      </p>
+    </section>
+
+    <hr>
+
+    <section id="past-work">
+      <h2>Past Research Work</h2>
+      <p>
+        <i>Open University Mars Climate Lab (2015), supervised by
+        <a href="http://www.open.ac.uk/people/srl89">Professor Stephen Lewis</a>:</i>
+        simulated entry, descent, and landing profiles for Mars under varying climate conditions; analysed seasonal ice-cap variation using Martian climate simulations.
+      </p>
+    </section>
+
+    <hr>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Email: <a href="mailto:xiaziyna@gmail.com">xiaziyna@gmail.com</a> · <a href="mailto:tjamila@umich.edu">tjamila@umich.edu</a></p>
+      <p><a href="Jamila_CV.pdf">CV (PDF)</a></p>
+    </section>
+  </main>
+
+  <footer class="container">
+    <hr>
+    <p>Last updated: Oct 2025 · <a href="Jamila_CV.pdf">CV (PDF)</a></p>
+  </footer>
 </body>
 </html>
