@@ -34,7 +34,7 @@
       .header img{float:none;margin:1rem 0 0 0;width:120px;height:120px}
     }
 
-    /* Project list – single-column cards */
+    /* Project list – single-column cards with image on the left */
     .project-grid{
       display:flex;
       flex-direction:column;
@@ -46,14 +46,21 @@
       padding:.75rem;
       background:#fafafa;
       width:100%;
+      display:flex;
+      gap:.75rem;
+      align-items:flex-start;
     }
-.project-card img{
-  width:220px;        /* thumbnail size */
-  max-width:100%;     /* don’t overflow on very small screens */
-  height:auto;
-  display:block;
-  margin:0 auto .5rem; /* centre the image and keep a small gap below */
-}
+    .project-card img{
+      width:120px;
+      max-width:100%;
+      height:auto;
+      display:block;
+      margin:0;
+      flex-shrink:0;
+    }
+    .project-card figcaption{
+      flex:1;
+    }
     .project-card h3{
       margin:.25rem 0 .35rem 0;
       font-size:1.02rem;
@@ -61,6 +68,15 @@
     .project-card p{
       margin:.1rem 0;
       font-size:0.92rem;
+    }
+
+    @media (max-width:600px){
+      .project-card{
+        flex-direction:row; /* still left-right, but smaller screen */
+      }
+      .project-card img{
+        width:90px;
+      }
     }
   </style>
 </head>
@@ -207,74 +223,3 @@
             </p>
             <p>
               <a href="https://github.com/xiaziyna/CUDA-transit-detection" target="_blank">Code</a>
-            </p>
-          </figcaption>
-        </figure>
-
-        <figure class="project-card">
-          <img src="exoplanet_day_thumb.png" alt="Transit light curve still from exoplanet bot" />
-          <figcaption>
-            <h3>Exoplanet of the Day</h3>
-            <p>
-              Twitter/X bot that posts an animated transit light curve each day, turning survey data into
-              lightweight public-facing visualisations.
-            </p>
-            <p>
-              <a href="https://twitter.com/exoplanet_day" target="_blank">Bot</a> ·
-              <a href="https://github.com/xiaziyna/lightcurve-of-the-day" target="_blank">Code</a>
-            </p>
-          </figcaption>
-        </figure>
-
-        <figure class="project-card">
-          <img src="tess_joint_search_thumb.png" alt="Phase-folded TESS transit thumbnails" />
-          <figcaption>
-            <h3>TESS Joint Bayesian Transit Search</h3>
-            <p>
-              Large-scale joint transit search on TESS 2-minute light curves, run on a 250k node-hour Blue Waters
-              allocation.
-            </p>
-            <p>
-              <a href="bw_proposal.pdf" target="_blank">Blue Waters proposal</a>
-            </p>
-          </figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <hr>
-
-    <section id="media">
-      <h2>Talks &amp; Media</h2>
-      <ul>
-        <li>
-          <a href="https://www.youtube.com/watch?v=oOqwSfjE3qA" target="_blank" rel="noopener">
-            Research interview (YouTube)
-          </a>
-        </li>
-      </ul>
-    </section>
-
-    <hr>
-
-    <section id="past-work">
-      <h2>Past Research Work</h2>
-      <p>
-        <i>Open University Mars Climate Lab (2015), supervised by
-        <a href="http://www.open.ac.uk/people/srl89">Professor Stephen Lewis</a>:</i>
-        simulated entry, descent, and landing profiles for Mars under varying climate conditions; analysed seasonal ice-cap variation using Martian climate simulations.
-      </p>
-    </section>
-
-    <hr>
-
-    <section id="contact">
-      <h2>Contact</h2>
-      <p>
-        Email: <a href="mailto:xiaziyna@gmail.com">xiaziyna@gmail.com</a> ·
-        <a href="mailto:tjamila@umich.edu">tjamila@umich.edu</a>
-      </p>
-    </section>
-  </main>
-</body>
-</html>
