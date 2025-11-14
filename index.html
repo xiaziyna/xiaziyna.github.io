@@ -176,8 +176,7 @@
           <figcaption>
             <h3>Exoplanet of the Day</h3>
             <p>
-              Twitter/X bot that posts an animated transit light curve each day, turning survey data into
-              lightweight public-facing visualisations.
+              Ode to the transit detection technique. Twitter/X bot that posts an animated transit light curve each day, using a real Kepler detection and light curve. Visualizes the transit to scale.
             </p>
             <p>
               <a href="https://twitter.com/exoplanet_day" target="_blank">Bot</a> ·
@@ -186,34 +185,7 @@
           </figcaption>
         </figure>
 
-        <!-- Row 2: NUFFT | CUDA -->
-        <figure class="project-card">
-          <img src="nufft_thumb.png" alt="Light curve and NUFFT detection statistic thumbnail" />
-          <figcaption>
-            <h3>NUFFT Transit Detector (cuvarbase)</h3>
-            <p>
-              NUFFT-based likelihood ratio test for finding transits in correlated stellar variability, gappy light curves, implemented within the <code>cuvarbase</code> toolkit.
-            </p>
-            <p>
-              <a href="https://github.com/johnh2o2/cuvarbase/tree/v1.0" target="_blank">Code (v1.0)</a>
-            </p>
-          </figcaption>
-        </figure>
-
-        <figure class="project-card">
-          <img src="cuda_thumb.png" alt="GPU vs CPU performance plot thumbnail" />
-          <figcaption>
-            <h3>CUDA Transit Detection</h3>
-            <p>
-              Prototype GPU kernels for Bayesian transit likelihood ratio tests with full rank covariance models. These models can account for both systematic noise, and stellar variability.
-            </p>
-            <p>
-              <a href="https://github.com/xiaziyna/CUDA-transit-detection" target="_blank">Code</a>
-            </p>
-          </figcaption>
-        </figure>
-
-        <!-- Row 3: spatial-detrend | TESS joint search -->
+        <!-- Row 2: spatial-detrend | CUDA -->
         <figure class="project-card">
           <img src="spatial_thumb.png" alt="Raw and detrended light curve panels" />
           <figcaption>
@@ -229,12 +201,40 @@
         </figure>
 
         <figure class="project-card">
+          <img src="cuda_thumb.png" alt="GPU vs CPU performance plot thumbnail" />
+          <figcaption>
+            <h3>CUDA Transit Detection</h3>
+            <p>
+              Prototype GPU kernels for fast Bayesian transit likelihood ratio tests with full rank covariance models that account for both instrument systematics and stellar variability. 
+            </p>
+            <p>
+              <a href="https://github.com/xiaziyna/CUDA-transit-detection" target="_blank">Code</a>
+            </p>
+          </figcaption>
+        </figure>
+
+        <!-- Row 3: NUFFT | TESS joint search -->
+        <figure class="project-card">
+          <img src="nufft_thumb.png" alt="Light curve and NUFFT detection statistic thumbnail" />
+          <figcaption>
+            <h3>NUFFT Transit Detector (cuvarbase)</h3>
+            <p>
+              NUFFT-based likelihood ratio test for transits in correlated stellar variability and gappy TESS light curves, implemented as a
+              GPU-accelerated matched filter within the <code>cuvarbase</code> toolkit.
+            </p>
+            <p>
+              <a href="https://github.com/johnh2o2/cuvarbase/tree/v1.0" target="_blank">Code (v1.0)</a>
+            </p>
+          </figcaption>
+        </figure>
+
+        <figure class="project-card">
           <img src="tess_joint_search_thumb.png" alt="Phase-folded TESS transit thumbnails" />
           <figcaption>
             <h3>TESS Joint Bayesian Transit Search</h3>
             <p>
-              Large-scale joint transit search on TESS 2-minute light curves using joint-Bayesian detection, run on a 250k node-hour Blue Waters
-              allocation. Read our successful proposal!
+              Large-scale joint transit search on TESS 2-minute light curves, run on a 250k node-hour Blue Waters
+              allocation. Read our successful proposal here!
             </p>
             <p>
               <a href="bw_proposal.pdf" target="_blank">Blue Waters proposal</a>
