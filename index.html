@@ -26,15 +26,15 @@
     .btn-secondary{display:inline-block;padding:.6rem 1rem;border:1px solid #aaa;text-decoration:none;color:#111}
     .btn-secondary:hover{background:#111;color:#fff;border-color:#111}
     h2{margin-top:2rem}
-    ul.pubs, ul.projects{list-style:none;padding-left:0}
-    ul.pubs li, ul.projects li{margin:.6rem 0}
+    ul.pubs{list-style:none;padding-left:0}
+    ul.pubs li{margin:.6rem 0}
     .yr{display:inline-block;min-width:3ch;font-variant-numeric:tabular-nums;color:#555}
     footer{margin:2rem 0 3rem}
     @media (max-width:600px){.header img{float:none;margin:1rem 0 0 0;width:120px;height:120px}}
 
-    /* Project list */
+    /* Project list – single-column cards */
     .project-grid{
-      display:flex;          /* single column, full width */
+      display:flex;
       flex-direction:column;
       gap:1.5rem;
       margin-top:1.5rem;
@@ -43,7 +43,7 @@
       border:1px solid #eee;
       padding:.75rem;
       background:#fafafa;
-      width:100%;            /* make sure it spans the container */
+      width:100%;
     }
     .project-card img{
       width:100%;
@@ -90,4 +90,25 @@
       Before Illinois, I completed an MSc in Astrophysics at
       <a href="https://www.royalholloway.ac.uk/">Royal Holloway, University of London</a>.
     </p>
-    <p>Research interests: detection theory for transit photometry, sub-µas astrometry for stellar-surface mapping, and starshade high-contrast imag
+    <p>Research interests: detection theory for transit photometry, sub-µas astrometry for stellar-surface mapping, and starshade high-contrast imaging.</p>
+    <p class="cta">
+      <a class="btn" href="Jamila_CV.pdf">Download CV (PDF)</a>
+      <a class="btn" href="research_statement.pdf">Research Statement (PDF)</a>
+    </p>
+  </header>
+
+  <main class="container">
+    <hr>
+
+    <section id="publications">
+      <h2>Publications</h2>
+      <ul class="pubs">
+        <li>
+          <span class="yr">2025</span>
+          <strong>Taaki</strong>, Kemball, Kamalabadi.
+          <em>PyStarshade: Simulating High-Contrast Imaging of Exoplanets with Starshades</em>.
+          Journal of Open Source Software. <a href="https://doi.org/10.21105/joss.07917">DOI</a>
+        </li>
+        <li>
+          <span class="yr">2025</span>
+          <strong>Taaki</strong>,
