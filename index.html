@@ -47,12 +47,13 @@
       background:#fafafa;
       width:100%;
     }
-    .project-card img{
-      width:100%;
-      height:auto;
-      display:block;
-      margin-bottom:.5rem;
-    }
+.project-card img{
+  width:220px;        /* thumbnail size */
+  max-width:100%;     /* don’t overflow on very small screens */
+  height:auto;
+  display:block;
+  margin:0 auto .5rem; /* centre the image and keep a small gap below */
+}
     .project-card h3{
       margin:.25rem 0 .35rem 0;
       font-size:1.02rem;
