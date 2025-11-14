@@ -31,6 +31,33 @@
     .yr{display:inline-block;min-width:3ch;font-variant-numeric:tabular-nums;color:#555}
     footer{margin:2rem 0 3rem}
     @media (max-width:600px){.header img{float:none;margin:1rem 0 0 0;width:120px;height:120px}}
+
+    /* Project grid (Nick-style tiles) */
+    .project-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:1.5rem;
+      margin-top:1.5rem;
+    }
+    .project-card{
+      border:1px solid #eee;
+      padding:.75rem;
+      background:#fafafa;
+    }
+    .project-card img{
+      width:100%;
+      height:auto;
+      display:block;
+      margin-bottom:.5rem;
+    }
+    .project-card h3{
+      margin:.25rem 0 .35rem 0;
+      font-size:1.02rem;
+    }
+    .project-card p{
+      margin:.1rem 0;
+      font-size:0.92rem;
+    }
   </style>
 </head>
 <body>
@@ -120,6 +147,8 @@
 
     <section id="projects">
       <h2>Projects / Software</h2>
+
+      <!-- Existing compact list -->
       <ul class="projects">
         <li>
           <a href="https://github.com/xiaziyna/PyStarshade" target="_blank">PyStarshade</a> —
@@ -138,6 +167,96 @@
           Efficient full-rank covariance tests for Bayesian transit detection.
         </li>
       </ul>
+
+      <!-- Nick-style project tiles -->
+      <div class="project-grid">
+        <figure class="project-card">
+          <img src="pystarshade_thumb.png" alt="Starshade pupil and PSF thumbnail" />
+          <figcaption>
+            <h3>PyStarshade</h3>
+            <p>
+              Python library for Fresnel diffraction simulations of starshades and other external occulters,
+              using Bluestein FFTs to resolve high-contrast PSFs over large spatial scales.
+            </p>
+            <p>
+              <a href="https://github.com/xiaziyna/PyStarshade" target="_blank">Code</a> ·
+              <a href="https://doi.org/10.21105/joss.07917" target="_blank">JOSS paper</a>
+            </p>
+          </figcaption>
+        </figure>
+
+        <figure class="project-card">
+          <img src="nufft_transit_detector_thumb.png" alt="Light curve and NUFFT detection statistic thumbnail" />
+          <figcaption>
+            <h3>NUFFT Transit Detector (cuvarbase)</h3>
+            <p>
+              NUFFT-based likelihood ratio test for transits in correlated, gappy light curves, implemented as a
+              GPU-accelerated matched filter within the <code>cuvarbase</code> toolkit.
+            </p>
+            <p>
+              <a href="https://github.com/johnh2o2/cuvarbase/tree/v1.0" target="_blank">Code (v1.0)</a>
+            </p>
+          </figcaption>
+        </figure>
+
+        <figure class="project-card">
+          <img src="spatial_detrend_thumb.png" alt="Raw and detrended light curve panels" />
+          <figcaption>
+            <h3>spatial-detrend</h3>
+            <p>
+              Low-rank, spatially-aware detrending for missions like Kepler and TESS, removing structured
+              detector systematics while preserving astrophysical variability.
+            </p>
+            <p>
+              <a href="https://github.com/xiaziyna/spatial-detrend" target="_blank">Code</a>
+            </p>
+          </figcaption>
+        </figure>
+
+        <figure class="project-card">
+          <img src="cuda_transit_detection_thumb.png" alt="GPU vs CPU performance plot thumbnail" />
+          <figcaption>
+            <h3>CUDA Transit Detection</h3>
+            <p>
+              Prototype GPU kernels for Bayesian transit tests with full covariance models, exploring how far joint
+              transit–systematics inference can be pushed on commodity GPUs.
+            </p>
+            <p>
+              <a href="https://github.com/xiaziyna/CUDA-transit-detection" target="_blank">Code</a>
+            </p>
+          </figcaption>
+        </figure>
+
+        <figure class="project-card">
+          <img src="exoplanet_day_thumb.png" alt="Transit light curve still from exoplanet bot" />
+          <figcaption>
+            <h3>Exoplanet of the Day</h3>
+            <p>
+              Twitter/X bot that posts an animated transit light curve each day, turning survey data into
+              lightweight public-facing visualisations.
+            </p>
+            <p>
+              <a href="https://twitter.com/exoplanet_day" target="_blank">Bot</a> ·
+              <a href="https://github.com/xiaziyna/lightcurve-of-the-day" target="_blank">Code</a>
+            </p>
+          </figcaption>
+        </figure>
+
+        <figure class="project-card">
+          <img src="tess_joint_search_thumb.png" alt="Phase-folded TESS transit thumbnails" />
+          <figcaption>
+            <h3>TESS Joint Bayesian Transit Search</h3>
+            <p>
+              Large-scale joint transit search on TESS 2-minute light curves, run on a 250k node-hour Blue Waters
+              allocation and feeding candidates into EXOFOP.
+            </p>
+            <p>
+              <a href="bw_proposal.pdf" target="_blank">Blue Waters proposal</a> ·
+              <a href="https://exofop.ipac.caltech.edu/tess/view_ctoi.php" target="_blank">EXOFOP candidates</a>
+            </p>
+          </figcaption>
+        </figure>
+      </div>
 
       <p>
         We were awarded a <a href="bw_proposal.pdf">250k Blue Waters allocation</a> for its final year of operations.
