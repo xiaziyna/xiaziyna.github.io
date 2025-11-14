@@ -34,10 +34,10 @@
       .header img{float:none;margin:1rem 0 0 0;width:120px;height:120px}
     }
 
-    /* Project list – single-column cards with image on the left */
+    /* Project grid – 2 cards per row, image on top */
     .project-grid{
-      display:flex;
-      flex-direction:column;
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
       gap:1.5rem;
       margin-top:1.5rem;
     }
@@ -47,19 +47,13 @@
       background:#fafafa;
       width:100%;
       display:flex;
-      gap:.75rem;
-      align-items:flex-start;
+      flex-direction:column;
     }
     .project-card img{
-      width:120px;
-      max-width:100%;
+      width:100%;
       height:auto;
       display:block;
-      margin:0;
-      flex-shrink:0;
-    }
-    .project-card figcaption{
-      flex:1;
+      margin:0 0 .5rem 0;
     }
     .project-card h3{
       margin:.25rem 0 .35rem 0;
@@ -68,15 +62,6 @@
     .project-card p{
       margin:.1rem 0;
       font-size:0.92rem;
-    }
-
-    @media (max-width:600px){
-      .project-card{
-        flex-direction:row; /* still left-right, but smaller screen */
-      }
-      .project-card img{
-        width:90px;
-      }
     }
   </style>
 </head>
