@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Rossiter-McLaughlin Effect</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: #111; color: #eee; font-family: system-ui; display: flex; height: 100vh; }
+#left { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#right { width: 400px; padding: 20px; background: #1a1a1a; overflow-y: auto; }
+canvas { background: #000; border-radius: 8px; }
+.control { margin: 12px 0; }
+.control label { display: block; margin-bottom: 4px; font-size: 13px; }
+.control input[type="range"] { width: 100%; }
+.value { float: right; font-family: monospace; color: #8af; }
+h2 { margin: 0 0 8px 0; font-size: 14px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+#info { margin-top: 20px; font-size: 13px; line-height: 1.5; color: #aaa; }
+#info b { color: #fff; }
+.ambiguity { background: #2a2a2a; padding: 12px; border-radius: 6px; margin-top: 15px; border-left: 3px solid #f80; }
+#rvPlot { margin-top: 20px; }
+button { background: #333; border: none; color: #fff; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 4px; }
+button:hover { background: #444; }
+button.active { background: #468; }
+</style>
+</head>
+<body>
+<div id="left">
+  <canvas id="star" width="500" height="500"></canvas>
+  <canvas id="rvPlot" width="500" height="200"></canvas>
+</div>
+<div id="right">
+  <h2>Orbital Parameters</h2>
+
+  <div class="control">
+    <label>Projected Obliquity λ <span class="value" id="lambdaVal">0°</span></label>
+    <input type="range" id="lambda" min="-180" max="180" value="0">
+  </div>
+
+  <div class="control">
+    <label>Impact Parameter b <span class="value" id="bVal">0.0</span></label>
+    <input type="range" id="b" min="0" max="95" value="0">
+  </div>
+
+  <div class="control">
+    <label>Planet/Star Radius Ratio <span class="value" id="rpVal">0.10</span></label>
+    <input type="range" id="rp" min="5" max="25" value="10">
+  </div>
+
+  <div class="control">
+    <label>v<sub>eq</sub> (km/s) <span class="value" id="veqVal">10</span></label>
+    <input type="range" id="veq" min="1" max="50" value="10">
+  </div>
+
+  <h2 style="margin-top: 20px;">Stellar Orientation</h2>
+
+  <div class="control">
+    <label>Stellar Inclination i★ <span class="value" id="istarVal">90°</span></label>
+    <input type="range" id="istar" min="5" max="90" value="90">
+    <div style="font-size: 11px; color: #666;">90° = equator-on, 0° = pole-on</div>
+  </div>
+
+  <div class="control">
+    <label>Spin Axis PA <span class="value" id="paVal">0°</span></label>
+    <input type="range" id="pa" min="-90" max="90" value="0">
+    <div style="font-size: 11px; color: #666;">Position angle on sky</div>
+  </div>
+
+  <div class="derived" style="background: #222; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 13px;">
+    v sin i★ = <span id="vsiniDerived">10.0</span> km/s
+  </div>
+
+  <div class="control" style="margin-top: 15px;">
+    <label>Transit Phase <span class="value" id="phaseVal">0.50</span></label>
+    <input type="range" id="phase" min="0" max="100" value="50">
+  </div>
+
+  <div style="margin-top: 15px;">
+    <button id="playBtn">▶ Play</button>
+    <button id="resetBtn">Reset</button>
+  </div>
+
+  <h2 style="margin-top: 25px;">Presets</h2>
+  <button onclick="setPreset(0, 0, 90, 0)">Aligned</button>
+  <button onclick="setPreset(90, 0, 90, 0)">Polar orbit</button>
+  <button onclick="setPreset(180, 0, 90, 0)">Retrograde</button>
+  <button onclick="setPreset(30, 50, 90, 0)">Grazing</button>
+  <button onclick="setPreset(0, 0, 30, 0)">Pole-on star</button>
+  <button onclick="setPreset(45, 0, 60, 45)">Tilted+rotated</button>
+
+  <div id="info">
+    <b>Rossiter-McLaughlin Effect</b><br>
+    As a planet transits, it blocks portions of the rotating stellar disk.
+    The star's approaching limb is blue-shifted, the receding limb red-shifted.
+    <br><br>
+    The RV anomaly depends on <b>which</b> part of the disk is blocked,
+    revealing the <b>projected spin-orbit angle λ</b>.
+
+    <div class="ambiguity">
+      <b>⚠ Ambiguities:</b><br>
+      • We measure λ (projected), not true 3D obliquity ψ<br>
+      • Stellar inclination i★ often unknown<br>
+      • High-b transits have weaker constraints<br>
+      • λ and (−λ) are degenerate for b=0
+    </div>
+  </div>
+</div>
+
+<script>
+const starCanvas = document.getElementById('star');
+const rvCanvas = document.getElementById('rvPlot');
+const starCtx = starCanvas.getContext('2d');
+const rvCtx = rvCanvas.getContext('2d');
+
+const controls = {
+  lambda: document.getElementById('lambda'),
+  b: document.getElementById('b'),
+  rp: document.getElementById('rp'),
+  veq: document.getElementById('veq'),
+  istar: document.getElementById('istar'),
+  pa: document.getElementById('pa'),
+  phase: document.getElementById('phase')
+};
+
+let playing = false;
+let animFrame;
+
+function getParams() {
+  const veq = +controls.veq.value;
+  const istar = +controls.istar.value * Math.PI / 180;
+  return {
+    lambda: +controls.lambda.value * Math.PI / 180,
+    b: +controls.b.value / 100,
+    rp: +controls.rp.value / 100,
+    veq: veq,
+    istar: istar,
+    pa: +controls.pa.value * Math.PI / 180,
+    vsini: veq * Math.sin(istar),
+    phase: +controls.phase.value / 100
+  };
+}
+
+function updateLabels() {
+  document.getElementById('lambdaVal').textContent = controls.lambda.value + '°';
+  document.getElementById('bVal').textContent = (+controls.b.value / 100).toFixed(2);
+  document.getElementById('rpVal').textContent = (+controls.rp.value / 100).toFixed(2);
+  document.getElementById('veqVal').textContent = controls.veq.value;
+  document.getElementById('istarVal').textContent = controls.istar.value + '°';
+  document.getElementById('paVal').textContent = controls.pa.value + '°';
+  document.getElementById('phaseVal').textContent = (+controls.phase.value / 100).toFixed(2);
+  const veq = +controls.veq.value;
+  const istar = +controls.istar.value * Math.PI / 180;
+  document.getElementById('vsiniDerived').textContent = (veq * Math.sin(istar)).toFixed(1);
+}
+
+function drawStar(ctx, cx, cy, R, params) {
+  // Draw rotating star with doppler coloring
+  // Spin axis tilted by istar from LOS, rotated by PA on sky
+  const imgData = ctx.createImageData(starCanvas.width, starCanvas.height);
+  const data = imgData.data;
+
+  const sinI = Math.sin(params.istar);
+  const cosI = Math.cos(params.istar);
+  const sinPA = Math.sin(params.pa);
+  const cosPA = Math.cos(params.pa);
+
+  for (let py = 0; py < starCanvas.height; py++) {
+    for (let px = 0; px < starCanvas.width; px++) {
+      const x = (px - cx) / R;
+      const y = (cy - py) / R; // flip y
+      const r2 = x*x + y*y;
+
+      if (r2 > 1) continue;
+
+      const z = Math.sqrt(1 - r2);
+
+      // Limb darkening
+      const ld = 0.3 + 0.7 * z;
+
+      // Rotate sky coords by -PA to align with spin axis reference
+      const xr = x * cosPA + y * sinPA;
+      const yr = -x * sinPA + y * cosPA;
+
+      // Doppler shift: spin axis in y-z plane tilted by istar
+      // Rotation velocity at point (xr, yr, z) with axis (0, sinI, cosI)
+      // v = omega x r, z-component gives LOS velocity
+      // vz = omega * (xr * sinI)
+      const doppler = xr * sinI;
+
+      // Color: blue-shifted vs red-shifted
+      let r, g, b;
+      const dAbs = Math.abs(doppler);
+      if (doppler > 0) {
+        r = 255 * ld * (1 - 0.4 * dAbs);
+        g = 255 * ld * (1 - 0.15 * dAbs);
+        b = 255 * ld;
+      } else {
+        r = 255 * ld;
+        g = 255 * ld * (1 - 0.15 * dAbs);
+        b = 255 * ld * (1 - 0.4 * dAbs);
+      }
+
+      const idx = (py * starCanvas.width + px) * 4;
+      data[idx] = r;
+      data[idx + 1] = g;
+      data[idx + 2] = b;
+      data[idx + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+
+  // Draw rotation axis indicator (projected onto sky)
+  // Axis direction: (0, sinI, cosI) rotated by PA
+  const axisX = sinI * sinPA;
+  const axisY = sinI * cosPA;
+  ctx.strokeStyle = '#4af8';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([5, 5]);
+  ctx.beginPath();
+  ctx.moveTo(cx - axisX * (R + 30), cy + axisY * (R + 30));
+  ctx.lineTo(cx + axisX * (R + 30), cy - axisY * (R + 30));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Draw pole marker (visible pole)
+  const poleX = axisX * cosI * 0.9;
+  const poleY = -axisY * cosI * 0.9;
+  if (cosI > 0.1) {
+    ctx.fillStyle = '#4af';
+    ctx.beginPath();
+    ctx.arc(cx + poleX * R, cy + poleY * R, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '11px system-ui';
+    ctx.fillText('pole', cx + poleX * R + 8, cy + poleY * R + 4);
+  }
+
+  // Draw equator as ellipse
+  ctx.strokeStyle = '#fff3';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  const eqSteps = 60;
+  for (let i = 0; i <= eqSteps; i++) {
+    const angle = (i / eqSteps) * Math.PI * 2;
+    // Equator in star's frame: circle in x-y plane (perpendicular to spin)
+    // After rotation, visible as ellipse
+    const ex = Math.cos(angle);
+    const ey = Math.sin(angle) * cosI;
+    const ez = -Math.sin(angle) * sinI;
+    if (ez < 0) continue; // behind star
+    // Rotate by PA
+    const px = (ex * cosPA - ey * sinPA) * R;
+    const py = -(ex * sinPA + ey * cosPA) * R;
+    if (i === 0 || ez < 0.01) ctx.moveTo(cx + px, cy + py);
+    else ctx.lineTo(cx + px, cy + py);
+  }
+  ctx.stroke();
+}
+
+function getPlanetPosition(params) {
+  // Phase 0 to 1, transit at 0.5
+  // Planet moves along path tilted by lambda
+  const t = (params.phase - 0.5) * 4; // -2 to 2 during transit window
+  const xOrbit = t; // along orbital path
+  const yOrbit = params.b; // impact parameter offset
+
+  // Rotate by lambda
+  const cosL = Math.cos(params.lambda);
+  const sinL = Math.sin(params.lambda);
+  const x = xOrbit * cosL - yOrbit * sinL;
+  const y = xOrbit * sinL + yOrbit * cosL;
+
+  return { x, y, visible: Math.abs(t) < 1.5 };
+}
+
+function drawPlanet(ctx, cx, cy, R, params) {
+  const pos = getPlanetPosition(params);
+  if (!pos.visible) return;
+
+  const px = cx + pos.x * R;
+  const py = cy - pos.y * R;
+  const pr = params.rp * R;
+
+  // Check if in front of star
+  const dist = Math.sqrt(pos.x*pos.x + pos.y*pos.y);
+  if (dist > 1 + params.rp) return;
+
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.arc(px, py, pr, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Draw orbital path
+  ctx.strokeStyle = '#ff84';
+  ctx.lineWidth = 2;
+  const pathLen = 2;
+  ctx.beginPath();
+  const x1 = -pathLen * Math.cos(params.lambda) - params.b * Math.sin(params.lambda);
+  const y1 = -pathLen * Math.sin(params.lambda) + params.b * Math.cos(params.lambda);
+  const x2 = pathLen * Math.cos(params.lambda) - params.b * Math.sin(params.lambda);
+  const y2 = pathLen * Math.sin(params.lambda) + params.b * Math.cos(params.lambda);
+  ctx.moveTo(cx + x1 * R, cy - y1 * R);
+  ctx.lineTo(cx + x2 * R, cy - y2 * R);
+  ctx.stroke();
+
+  // Arrow showing direction
+  ctx.fillStyle = '#ff8';
+  const ax = cx + (pos.x + 0.15 * Math.cos(params.lambda)) * R;
+  const ay = cy - (pos.y + 0.15 * Math.sin(params.lambda)) * R;
+  ctx.beginPath();
+  ctx.arc(ax, ay, 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function computeRVAnomaly(params, phase) {
+  const t = (phase - 0.5) * 4;
+  const xOrbit = t;
+  const yOrbit = params.b;
+
+  const cosL = Math.cos(params.lambda);
+  const sinL = Math.sin(params.lambda);
+  const x = xOrbit * cosL - yOrbit * sinL;
+  const y = xOrbit * sinL + yOrbit * cosL;
+
+  const dist = Math.sqrt(x*x + y*y);
+  if (dist > 1 + params.rp) return 0;
+
+  // Compute overlap with stellar disk
+  let overlap = 0;
+  if (dist < 1 - params.rp) {
+    overlap = Math.PI * params.rp * params.rp;
+  } else if (dist < 1 + params.rp) {
+    const d = dist;
+    const r1 = 1, r2 = params.rp;
+    if (d > 0) {
+      const part = (r1*r1 * Math.acos((d*d + r1*r1 - r2*r2)/(2*d*r1)) +
+                   r2*r2 * Math.acos((d*d + r2*r2 - r1*r1)/(2*d*r2)) -
+                   0.5 * Math.sqrt((r1+r2-d)*(d+r1-r2)*(d-r1+r2)*(d+r1+r2)));
+      overlap = Math.max(0, part);
+    }
+  }
+
+  // Rotate planet position by -PA to get coords in spin-axis frame
+  const sinPA = Math.sin(params.pa);
+  const cosPA = Math.cos(params.pa);
+  const xr = x * cosPA + y * sinPA;
+
+  // Limb darkening at planet position
+  const mu = Math.sqrt(Math.max(0, 1 - x*x - y*y));
+  const ld = 0.3 + 0.7 * mu;
+
+  // Doppler at planet position depends on xr and stellar inclination
+  const sinI = Math.sin(params.istar);
+  const blockedVel = xr * sinI;
+
+  // RV anomaly: blocked velocity weighted by area and LD
+  // Note: vsini = veq * sin(istar) is already computed
+  return -blockedVel * overlap * ld * params.veq / (Math.PI * 0.1 * 0.1);
+}
+
+function drawRVPlot(ctx, params) {
+  const w = rvCanvas.width, h = rvCanvas.height;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+
+  // Grid
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, h/2);
+  ctx.lineTo(w, h/2);
+  ctx.moveTo(w/2, 0);
+  ctx.lineTo(w/2, h);
+  ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#666';
+  ctx.font = '11px system-ui';
+  ctx.fillText('Phase', w - 40, h/2 + 15);
+  ctx.fillText('RV', 5, 15);
+  ctx.fillText('+', 5, 25);
+  ctx.fillText('−', 5, h - 10);
+
+  // Compute RV curve
+  const points = [];
+  let maxRV = 1;
+  for (let i = 0; i <= 100; i++) {
+    const ph = i / 100;
+    const rv = computeRVAnomaly({...params, phase: ph}, ph);
+    points.push({ x: i * w / 100, y: rv });
+    maxRV = Math.max(maxRV, Math.abs(rv));
+  }
+
+  // Scale
+  const scale = (h/2 - 20) / maxRV;
+
+  // Draw curve
+  ctx.strokeStyle = '#4af';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  points.forEach((p, i) => {
+    const y = h/2 - p.y * scale;
+    if (i === 0) ctx.moveTo(p.x, y);
+    else ctx.lineTo(p.x, y);
+  });
+  ctx.stroke();
+
+  // Current position marker
+  const currX = params.phase * w;
+  const currRV = computeRVAnomaly(params, params.phase);
+  const currY = h/2 - currRV * scale;
+
+  ctx.fillStyle = '#f84';
+  ctx.beginPath();
+  ctx.arc(currX, currY, 6, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Phase markers
+  ctx.fillStyle = '#555';
+  ctx.fillText('T₁', w * 0.25, h - 5);
+  ctx.fillText('T₄', w * 0.75, h - 5);
+}
+
+function draw() {
+  const params = getParams();
+  updateLabels();
+
+  const cx = starCanvas.width / 2;
+  const cy = starCanvas.height / 2;
+  const R = 180;
+
+  starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+  drawStar(starCtx, cx, cy, R, params);
+  drawPlanet(starCtx, cx, cy, R, params);
+
+  drawRVPlot(rvCtx, params);
+}
+
+function animate() {
+  if (!playing) return;
+  let phase = +controls.phase.value;
+  phase = (phase + 0.5) % 100;
+  controls.phase.value = phase;
+  draw();
+  animFrame = requestAnimationFrame(animate);
+}
+
+Object.values(controls).forEach(c => c.addEventListener('input', draw));
+
+document.getElementById('playBtn').addEventListener('click', () => {
+  playing = !playing;
+  document.getElementById('playBtn').textContent = playing ? '⏸ Pause' : '▶ Play';
+  if (playing) animate();
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  controls.lambda.value = 0;
+  controls.b.value = 0;
+  controls.rp.value = 10;
+  controls.veq.value = 10;
+  controls.istar.value = 90;
+  controls.pa.value = 0;
+  controls.phase.value = 50;
+  draw();
+});
+
+function setPreset(lambda, b, istar, pa) {
+  controls.lambda.value = lambda;
+  controls.b.value = b;
+  controls.istar.value = istar;
+  controls.pa.value = pa;
+  draw();
+}
+
+draw();
+</script>
+</body>
+</html>
