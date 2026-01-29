@@ -82,7 +82,7 @@
     <h1>Jamila Taaki</h1>
     <p class="tagline">Statistical inference &amp; computational methods for exoplanets</p>
     <p>
-      I’m a Schmidt Postdoctoral Fellow at the
+      I'm a Schmidt Postdoctoral Fellow at the
       <a href="https://midas.umich.edu/">Michigan Institute for Data &amp; AI in Society</a>
       (University of Michigan), mentored by
       <a href="https://sites.lsa.umich.edu/liacorrales/">Professor Lia Corrales (Astronomy)</a>
@@ -167,7 +167,21 @@
       <h2>Projects / Software</h2>
 
       <div class="project-grid">
-        <!-- Row 1: PyStarshade | Exoplanet of the Day -->
+        <!-- Row 1: Astrometric Jitter Visualizer | PyStarshade -->
+        <figure class="project-card">
+          <img src="astrometric_jitter_thumb.png" alt="Astrometric jitter visualizer showing starspot and planet signal" />
+          <figcaption>
+            <h3>Astrometric Jitter Visualizer</h3>
+            <p>
+              Astrometric jitter from starspots may limit our ability to find and measure Earth-like planets orbiting in the habitable zone of Sun-like stars.
+            </p>
+            <p>
+              <a href="astrometry_visualizer.html" target="_blank">Visualizer</a> ·
+              <a href="https://arxiv.org/abs/2601.11737" target="_blank">arXiv</a>
+            </p>
+          </figcaption>
+        </figure>
+
         <figure class="project-card">
           <img src="pystarshade_thumb.png" alt="Starshade pupil and PSF thumbnail" />
           <figcaption>
@@ -183,6 +197,7 @@
           </figcaption>
         </figure>
 
+        <!-- Row 2: Exoplanet of the Day | spatial-detrend -->
         <figure class="project-card">
           <img src="exoplanet_day_thumb.png" alt="Transit light curve still from exoplanet bot" />
           <figcaption>
@@ -197,7 +212,6 @@
           </figcaption>
         </figure>
 
-        <!-- Row 2: spatial-detrend | CUDA -->
         <figure class="project-card">
           <img src="spatial_thumb.jpg" alt="Raw and detrended light curve panels" />
           <figcaption>
@@ -212,29 +226,16 @@
           </figcaption>
         </figure>
 
+        <!-- Row 3: CUDA | TESS joint search -->
         <figure class="project-card">
           <img src="cuda_thumb.png" alt="GPU vs CPU performance plot thumbnail" />
           <figcaption>
             <h3>CUDA Transit Detection</h3>
             <p>
-              Prototype GPU kernels for fast Bayesian transit likelihood ratio tests with full rank covariance models that account for both instrument systematics and stellar variability. 
+              Prototype GPU kernels for fast Bayesian transit likelihood ratio tests with full rank covariance models that account for both instrument systematics and stellar variability.
             </p>
             <p>
               <a href="https://github.com/xiaziyna/CUDA-transit-detection" target="_blank">Code</a>
-            </p>
-          </figcaption>
-        </figure>
-
-        <!-- Row 3: NUFFT | TESS joint search -->
-        <figure class="project-card">
-          <figcaption>
-            <h3>NUFFT Transit Detector (cuvarbase)</h3>
-            <p>
-              Non Uniform FFT-based likelihood ratio test for transits in correlated stellar variability (stationary noise) and gappy TESS light curves, implemented
-              within the <code>cuvarbase</code> toolkit and adapted from our NASA space apps Hackathon <a href="https://www.spaceappschallenge.org/2025/find-a-team/exoghost/?tab=project" target="_blank">project</a>.
-            </p>
-            <p>
-              <a href="https://github.com/johnh2o2/cuvarbase/tree/v1.0" target="_blank">Code (v1.0)</a>
             </p>
           </figcaption>
         </figure>
