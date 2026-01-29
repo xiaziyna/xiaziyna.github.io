@@ -62,6 +62,9 @@
             border-radius: 8px;
             background: #0d1117;
         }
+        #trajectoryCanvas {
+            background: transparent;
+        }
         .control-group {
             margin-bottom: 15px;
         }
@@ -173,6 +176,28 @@
             color: #2ecc71;
             font-weight: bold;
         }
+        .preset-buttons, .toggle-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .preset, .toggle {
+            flex: 1;
+            padding: 5px 8px;
+            font-size: 0.75em;
+            background: rgba(255,255,255,0.1);
+            color: #aaa;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .preset:hover, .toggle:hover {
+            background: rgba(255,255,255,0.15);
+            color: #eee;
+        }
+        .toggle.active {
+            background: #64b5f6;
+            color: #1a1a2e;
+            border-color: #64b5f6;
+        }
     </style>
 </head>
 <body>
@@ -195,8 +220,15 @@
                     </div>
                     <div class="control-group">
                         <label>Spot Radius</label>
-                        <input type="range" id="spotRadius" min="2" max="25" value="10" step="1">
-                        <div class="value-display"><span id="spotRadiusValue">10</span>% of R<sub>★</sub></div>
+                        <input type="range" id="spotRadius" min="2" max="25" value="3" step="1">
+                        <div class="value-display"><span id="spotRadiusValue">3</span>% of R<sub>★</sub></div>
+                    </div>
+                    <div class="control-group">
+                        <label>Planet Mass</label>
+                        <div class="toggle-buttons">
+                            <button class="toggle active" id="earthMass">Earth</button>
+                            <button class="toggle" id="neptuneMass">Neptune</button>
+                        </div>
                     </div>
                 </div>
 
@@ -217,11 +249,17 @@
                 </div>
 
                 <div class="panel">
-                    <div class="info-box">
+                    <div class="info-box" id="systemInfo">
                         <strong>System:</strong> Earth-mass planet, Sun-like star<br><br>
                         <strong>Orbital period:</strong> 1 year (1 AU)<br><br>
-                        <strong>Stellar rotation:</strong> 60 days<br><br>
-                        <strong>Orbital plane:</strong> perpendicular to spin axis
+                        <strong>Stellar rotation:</strong> 60 days
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Physical Scale (at 10 pc)</h3>
+                    <div class="info-box" id="scaleInfo">
+                        Loading...
                     </div>
                 </div>
             </div>
@@ -237,21 +275,7 @@
                 </div>
                 <div class="panel trajectory-panel">
                     <h3>X-Y Astrometric Trajectory</h3>
-                    <canvas id="trajectoryCanvas" width="920" height="320"></canvas>
-                    <div class="legend">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #ff6b6b;"></div>
-                            <span>Starspot Jitter</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #4ecdc4;"></div>
-                            <span>Planet Wobble</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #9b59b6;"></div>
-                            <span>Combined Signal</span>
-                        </div>
-                    </div>
+                    <canvas id="trajectoryCanvas" width="1020" height="360"></canvas>
                 </div>
             </div>
         </div>
@@ -270,14 +294,19 @@
             totalDuration: 6,
             fps: 60,
             starRadius: 1.0,
-            // Earth-mass planet wobble in R_star units (exaggerated ~100x for visibility)
-            // Real value: ~6.5e-4 R_star, display value scaled up
-            planetWobbleAmplitude: 0.05,  // Display scale (real ~6.5e-4)
+            // Physical values in R_star units
+            // Earth-Sun wobble: a_star = (M_earth/M_sun) * 1AU ≈ 450 km ≈ 6.5e-4 R_star
+            earthWobbleAmplitude: 6.5e-4,
+            // Neptune is ~17 Earth masses
+            neptuneWobbleAmplitude: 6.5e-4 * 17,
             speedMultiplier: 0.15,
             spotContrast: 0.7,
-            // Scale factor for jitter amplitude (adjusts spot effect strength)
-            // Real starspot jitter ~0.1-1% of R_star for active stars
-            jitterScaleFactor: 3.0,
+            // Common display scale factor applied to BOTH signals for visibility
+            displayScaleFactor: 80,
+            // Distance for μas calculation
+            distancePc: 10,
+            // At 10 pc: 1 R_sun = 465 μas
+            muasPerRstar: 465,
         };
 
         // State
@@ -288,7 +317,8 @@
             lastTimestamp: 0,
             inclination: 90,  // Start edge-on
             spotLatitude: 30,
-            spotRadius: 0.10,
+            spotRadius: 0.03,
+            planetMass: 'earth',  // 'earth' or 'neptune'
             jitterX: [],
             jitterY: [],
             wobbleX: [],
@@ -371,17 +401,16 @@
             }
 
             // Photocenter displacement formula (based on Morris et al. 2009, Sowmya et al. 2021):
-            // δ/R_star ≈ f_spot * C * μ * geometric_factor
+            // δ/R_star ≈ f_spot * C * μ
             // where f_spot = spot fractional area, C = contrast, μ = cos(viewing angle)
-            const spotArea = Math.PI * state.spotRadius * state.spotRadius;  // fractional area
+            const spotFractionalArea = state.spotRadius * state.spotRadius;  // (r_spot/R_star)²
             const contrast = config.spotContrast;
             const mu = spot_obs.y;  // cos(angle from line of sight)
             const limbDarkening = 0.4 + 0.6 * mu;  // linear limb darkening
-            const foreshortening = mu;
 
-            // Scale factor includes geometric effects and display scaling
-            // Real jitter is ~0.1-1% R_star for 10% spot on active star
-            const effectiveFactor = spotArea * contrast * limbDarkening * foreshortening * config.jitterScaleFactor;
+            // Physical jitter amplitude (in R_star), then scaled for display
+            const physicalJitter = spotFractionalArea * contrast * limbDarkening * mu;
+            const effectiveFactor = physicalJitter * config.displayScaleFactor;
 
             return {
                 x: -spot_obs.x * effectiveFactor,
@@ -394,8 +423,16 @@
             const orbitalPhase = (2 * Math.PI * time) / config.planetOrbitalPeriod;
             const incRad = state.inclination * Math.PI / 180;
 
-            const wobbleX_star = -config.planetWobbleAmplitude * Math.cos(orbitalPhase);
-            const wobbleY_star = -config.planetWobbleAmplitude * Math.sin(orbitalPhase);
+            // Select wobble amplitude based on planet mass
+            const baseAmplitude = state.planetMass === 'neptune'
+                ? config.neptuneWobbleAmplitude
+                : config.earthWobbleAmplitude;
+
+            // Physical wobble scaled by same display factor as jitter
+            const scaledAmplitude = baseAmplitude * config.displayScaleFactor;
+
+            const wobbleX_star = -scaledAmplitude * Math.cos(orbitalPhase);
+            const wobbleY_star = -scaledAmplitude * Math.sin(orbitalPhase);
             const wobbleZ_star = 0;
 
             const wobble_obs = starToObserver(wobbleX_star, wobbleY_star, wobbleZ_star, incRad);
@@ -404,88 +441,69 @@
         }
 
         // Draw a circular spot on the sphere by sampling its boundary
+        // Uses canvas clipping to handle limb crossing cleanly
         function drawSpotOnSphere(ctx, cx, cy, r, spotLatRad, spotLonRad, spotAngularRadius, incRad) {
-            // Sample points around the spot boundary
-            const numPoints = 48;
+            const numPoints = 64;
             const points = [];
 
             for (let i = 0; i <= numPoints; i++) {
                 const angle = (i / numPoints) * 2 * Math.PI;
 
-                // Point on spot boundary in spot-local frame
-                // Spot center is at (spotLat, spotLon)
-                // We trace a small circle of angular radius spotAngularRadius
                 const cosR = Math.cos(spotAngularRadius);
                 const sinR = Math.sin(spotAngularRadius);
 
-                // Direction from spot center
                 const dx = sinR * Math.cos(angle);
                 const dy = sinR * Math.sin(angle);
                 const dz = cosR;
 
-                // Rotate this to the spot's position on the sphere
-                // First, the spot center in star frame
-                const centerLat = spotLatRad;
-                const centerLon = spotLonRad;
+                const cosLat = Math.cos(spotLatRad);
+                const sinLat = Math.sin(spotLatRad);
+                const cosLon = Math.cos(spotLonRad);
+                const sinLon = Math.sin(spotLonRad);
 
-                // Transform from spot-local to star frame
-                // Spot local: z points radially outward at spot center
-                // Need to rotate: first by latitude around Y, then by longitude around Z
-                const cosLat = Math.cos(centerLat);
-                const sinLat = Math.sin(centerLat);
-                const cosLon = Math.cos(centerLon);
-                const sinLon = Math.sin(centerLon);
-
-                // Rotate around Y by (90° - lat) to tilt from pole to correct latitude
-                // Then rotate around Z by lon
                 const x1 = dx * cosLat + dz * sinLat;
                 const y1 = dy;
                 const z1 = -dx * sinLat + dz * cosLat;
 
-                // Rotate around Z by longitude
                 const x_star = x1 * cosLon - y1 * sinLon;
                 const y_star = x1 * sinLon + y1 * cosLon;
                 const z_star = z1;
 
-                // Transform to observer frame
                 const obs = starToObserver(x_star, y_star, z_star, incRad);
 
-                if (obs.y > 0.001) {  // Visible
-                    points.push({
-                        x: cx + obs.x * r,
-                        y: cy - obs.z * r,
-                        visible: true
-                    });
-                } else {
-                    points.push({ visible: false });
-                }
+                // Project all points, even those behind limb
+                // We'll use clipping to handle the limb
+                points.push({
+                    x: cx + obs.x * r,
+                    y: cy - obs.z * r,
+                    depth: obs.y
+                });
             }
 
-            // Draw the spot as a filled polygon
+            // Check if any part of spot is visible
+            const anyVisible = points.some(p => p.depth > 0);
+            if (!anyVisible) return false;
+
+            // Use clipping to cleanly cut at the limb
+            ctx.save();
             ctx.beginPath();
-            let started = false;
-            let hasVisiblePoints = false;
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.clip();
 
-            for (let i = 0; i < points.length; i++) {
-                if (points[i].visible) {
-                    hasVisiblePoints = true;
-                    if (!started) {
-                        ctx.moveTo(points[i].x, points[i].y);
-                        started = true;
-                    } else {
-                        ctx.lineTo(points[i].x, points[i].y);
-                    }
-                }
+            // Draw the spot polygon
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
             }
+            ctx.closePath();
 
-            if (hasVisiblePoints) {
-                ctx.closePath();
-                const darkness = Math.floor(255 * (1 - config.spotContrast * 0.8));
-                ctx.fillStyle = `rgb(${darkness}, ${Math.floor(darkness * 0.7)}, ${Math.floor(darkness * 0.4)})`;
-                ctx.fill();
-            }
+            const darkness = Math.floor(255 * (1 - config.spotContrast * 0.8));
+            ctx.fillStyle = `rgb(${darkness}, ${Math.floor(darkness * 0.7)}, ${Math.floor(darkness * 0.4)})`;
+            ctx.fill();
 
-            return hasVisiblePoints;
+            ctx.restore();
+            return true;
         }
 
         // Draw latitude/longitude grid on sphere
@@ -846,9 +864,9 @@
             ctx.font = '10px sans-serif';
             ctx.textAlign = 'left';
 
-            // Planet label with depth indicator
-            const depthText = planetInFront ? '' : ' (behind)';
-            ctx.fillText('Earth-mass planet' + depthText, planetScreenX + 12, planetScreenY + 4);
+            // Planet label
+            const planetLabel = state.planetMass === 'neptune' ? 'Neptune-mass planet' : 'Earth-mass planet';
+            ctx.fillText(planetLabel, planetScreenX + 12, planetScreenY + 4);
 
             // Star label (positioned higher to avoid barycenter overlap)
             ctx.fillText('Sun-like star', starScreenX + starDisplayRadius + 5, starScreenY - 15);
@@ -909,9 +927,9 @@
 
             ctx.clearRect(0, 0, w, h);
 
-            const plotSize = 240;
-            const margin = 55;
-            const gap = 55;
+            const plotSize = 280;
+            const margin = 60;
+            const gap = 50;
 
             const plots = [
                 { title: 'Starspot Jitter', dataX: state.jitterX, dataY: state.jitterY, color: '#ff6b6b' },
@@ -936,8 +954,11 @@
                 const plotCx = margin + plotSize / 2 + idx * (plotSize + gap);
                 const plotCy = h / 2 + 10;
 
-                ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                ctx.fillRect(plotCx - plotSize/2, plotCy - plotSize/2, plotSize, plotSize);
+                // Draw individual black background box for each plot with rounded corners
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.beginPath();
+                ctx.roundRect(plotCx - plotSize/2, plotCy - plotSize/2, plotSize, plotSize, 8);
+                ctx.fill();
 
                 ctx.strokeStyle = 'rgba(255,255,255,0.15)';
                 ctx.lineWidth = 1;
@@ -970,13 +991,16 @@
                 ctx.arc(currX, currY, 5, 0, Math.PI * 2);
                 ctx.fill();
 
-                ctx.fillStyle = '#aaa';
+                // Title in matching color
+                ctx.fillStyle = plot.color;
                 ctx.font = '12px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(plot.title, plotCx, plotCy - plotSize/2 - 12);
 
+                // Axis labels
+                ctx.fillStyle = '#888';
                 ctx.font = '10px sans-serif';
-                ctx.fillText('x photocenter', plotCx + plotSize/2 - 25, plotCy + plotSize/2 + 18);
+                ctx.fillText('x photocenter', plotCx, plotCy + plotSize/2 + 18);
                 ctx.save();
                 ctx.translate(plotCx - plotSize/2 - 12, plotCy);
                 ctx.rotate(-Math.PI / 2);
@@ -1015,6 +1039,45 @@
         function updateTimeDisplay() {
             document.getElementById('timeDisplay').textContent = state.time.toFixed(2);
             document.getElementById('lonDisplay').textContent = Math.round(getCurrentLongitude());
+        }
+
+        function updateSystemInfo() {
+            const planetLabel = state.planetMass === 'neptune' ? 'Neptune-mass' : 'Earth-mass';
+            document.getElementById('systemInfo').innerHTML =
+                `<strong>System:</strong> ${planetLabel} planet, Sun-like star<br><br>` +
+                `<strong>Orbital period:</strong> 1 year (1 AU)<br><br>` +
+                `<strong>Stellar rotation:</strong> 60 days`;
+        }
+
+        function updateScaleInfo() {
+            // Calculate physical amplitudes in R_star
+            const spotArea = state.spotRadius * state.spotRadius;  // fractional area
+            // Peak jitter occurs near disk center where μ ≈ 1, limbDarkening ≈ 1
+            const peakJitterRstar = spotArea * config.spotContrast * 1.0 * 1.0;
+            const wobbleRstar = state.planetMass === 'neptune'
+                ? config.neptuneWobbleAmplitude
+                : config.earthWobbleAmplitude;
+
+            // Convert to μas at 10 pc (1 R_star = 465 μas)
+            const peakJitterMuas = peakJitterRstar * config.muasPerRstar;
+            const wobbleMuas = wobbleRstar * config.muasPerRstar;
+            const ratio = peakJitterMuas / wobbleMuas;
+
+            // Also show in milli-R_star for comparison with Sowmya et al.
+            const peakJitterMRstar = peakJitterRstar * 1000;
+            const wobbleMRstar = wobbleRstar * 1000;
+
+            const planetLabel = state.planetMass === 'neptune' ? 'Neptune' : 'Earth';
+
+            document.getElementById('scaleInfo').innerHTML =
+                `<strong>Spot area:</strong> ${(spotArea * 100).toFixed(2)}% of disk<br><br>` +
+                `<strong>${planetLabel} wobble:</strong><br>` +
+                `  ${wobbleMRstar.toFixed(2)} mR<sub>★</sub> = ${wobbleMuas.toFixed(2)} μas<br><br>` +
+                `<strong>Peak spot jitter:</strong><br>` +
+                `  ${peakJitterMRstar.toFixed(2)} mR<sub>★</sub> = ${peakJitterMuas.toFixed(1)} μas<br><br>` +
+                `<strong>Jitter/Wobble ratio:</strong> ${ratio.toFixed(1)}×<br><br>` +
+                `<span style="color:#888;font-size:0.85em">` +
+                `Ref: Sowmya+ 2021 solar jitter ~1 mR<sub>★</sub></span>`;
         }
 
         // Event handlers
@@ -1063,11 +1126,35 @@
             document.getElementById('spotRadiusValue').textContent = this.value;
             computeSignals();
             render();
+            updateScaleInfo();
+        });
+
+        // Planet mass toggle
+        document.getElementById('earthMass').addEventListener('click', function() {
+            state.planetMass = 'earth';
+            document.getElementById('earthMass').classList.add('active');
+            document.getElementById('neptuneMass').classList.remove('active');
+            computeSignals();
+            render();
+            updateScaleInfo();
+            updateSystemInfo();
+        });
+
+        document.getElementById('neptuneMass').addEventListener('click', function() {
+            state.planetMass = 'neptune';
+            document.getElementById('neptuneMass').classList.add('active');
+            document.getElementById('earthMass').classList.remove('active');
+            computeSignals();
+            render();
+            updateScaleInfo();
+            updateSystemInfo();
         });
 
         // Initialize
         computeSignals();
         render();
+        updateScaleInfo();
+        updateSystemInfo();
     </script>
 </body>
 </html>
