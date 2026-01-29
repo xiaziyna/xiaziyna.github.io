@@ -850,6 +850,12 @@
             ctx.fillStyle = starGradient;
             ctx.fill();
 
+            // Draw spot on the orbital view star
+            const latRad = state.spotLatitude * Math.PI / 180;
+            const rotPhase = (2 * Math.PI * state.time) / config.stellarRotationPeriod;
+            const spotAngularRadius = state.spotRadius * Math.PI / 2;
+            drawSpotOnSphere(ctx, starScreenX, starScreenY, starDisplayRadius, latRad, rotPhase, spotAngularRadius, incRad);
+
             // Draw planet (with depth indication)
             const planetDisplayRadius = planetInFront ? 9 : 7;
             ctx.globalAlpha = planetInFront ? 1.0 : 0.5;
