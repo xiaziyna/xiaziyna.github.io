@@ -252,7 +252,8 @@
                     <div class="info-box" id="systemInfo">
                         <strong>System:</strong> Earth-mass planet, Sun-like star<br><br>
                         <strong>Orbital period:</strong> 1 year (1 AU)<br><br>
-                        <strong>Stellar rotation:</strong> 60 days
+                        <strong>Stellar rotation:</strong> 60 days<br>
+                        <span style="color:#888;font-size:0.85em">(true solar: 25 days)</span>
                     </div>
                 </div>
 
@@ -461,9 +462,9 @@
                 const cosLon = Math.cos(spotLonRad);
                 const sinLon = Math.sin(spotLonRad);
 
-                const x1 = dx * cosLat + dz * sinLat;
+                const x1 = dx * sinLat + dz * cosLat;
                 const y1 = dy;
-                const z1 = -dx * sinLat + dz * cosLat;
+                const z1 = -dx * cosLat + dz * sinLat;
 
                 const x_star = x1 * cosLon - y1 * sinLon;
                 const y_star = x1 * sinLon + y1 * cosLon;
@@ -1052,7 +1053,8 @@
             document.getElementById('systemInfo').innerHTML =
                 `<strong>System:</strong> ${planetLabel} planet, Sun-like star<br><br>` +
                 `<strong>Orbital period:</strong> 1 year (1 AU)<br><br>` +
-                `<strong>Stellar rotation:</strong> 60 days`;
+                `<strong>Stellar rotation:</strong> 60 days<br>` +
+                `<span style="color:#888;font-size:0.85em">(true solar: 25 days)</span>`;
         }
 
         function updateScaleInfo() {
