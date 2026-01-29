@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astrometric Jitter vs Planet Signal Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+            color: #f0f0f0;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .panel h3 {
+            margin-bottom: 10px;
+            color: #64b5f6;
+            font-size: 1em;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            background: #0d1117;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+            color: #aaa;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #64b5f6;
+            cursor: pointer;
+        }
+        .value-display {
+            text-align: right;
+            font-size: 0.8em;
+            color: #64b5f6;
+            margin-top: 4px;
+        }
+        .legend {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+            font-size: 0.8em;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-color {
+            width: 16px;
+            height: 4px;
+            border-radius: 2px;
+        }
+        .info-box {
+            background: rgba(100, 181, 246, 0.1);
+            border: 1px solid rgba(100, 181, 246, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+        .play-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+        button {
+            background: #64b5f6;
+            border: none;
+            color: #1a1a2e;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85em;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #90caf9;
+        }
+        button.secondary {
+            background: rgba(255,255,255,0.1);
+            color: #eee;
+        }
+        button.secondary:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .time-display {
+            text-align: center;
+            font-family: monospace;
+            color: #888;
+            margin-top: 10px;
+            font-size: 0.85em;
+        }
+        .visuals-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 15px;
+        }
+        .trajectory-panel {
+            grid-column: 1 / -1;
+        }
+        .symbol-lat {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .symbol-lon {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>How do starspots contaminate astrometric planet detection?</h1>
+
+        <div class="main-layout">
+            <div class="sidebar">
+                <div class="panel">
+                    <h3>Parameters</h3>
+                    <div class="control-group">
+                        <label>Stellar Inclination (i)</label>
+                        <input type="range" id="inclination" min="0" max="90" value="90" step="1">
+                        <div class="value-display"><span id="incValue">90</span>° <span style="color:#666">(0°=pole-on, 90°=edge-on)</span></div>
+                    </div>
+                    <div class="control-group">
+                        <label>Spot Latitude (<span class="symbol-lat">λ</span>)</label>
+                        <input type="range" id="spotLat" min="0" max="90" value="30" step="1">
+                        <div class="value-display"><span id="spotLatValue">30</span>° <span style="color:#666">(0°=equator, 90°=pole)</span></div>
+                    </div>
+                    <div class="control-group">
+                        <label>Spot Radius</label>
+                        <input type="range" id="spotRadius" min="2" max="25" value="10" step="1">
+                        <div class="value-display"><span id="spotRadiusValue">10</span>% of R<sub>★</sub></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Playback</h3>
+                    <div class="play-controls">
+                        <button id="playPause">▶ Play</button>
+                        <button id="reset" class="secondary">Reset</button>
+                    </div>
+                    <div class="play-controls" style="margin-top: 8px;">
+                        <button id="speedDown" class="secondary">0.5x</button>
+                        <button id="speedUp" class="secondary">2x</button>
+                    </div>
+                    <div class="time-display">
+                        <div>Time: <span id="timeDisplay">0.00</span> / 6.00 rotations</div>
+                        <div>Longitude (<span class="symbol-lon">φ</span>): <span id="lonDisplay">0</span>°</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="info-box">
+                        <strong>System:</strong> Earth-mass planet, Sun-like star<br><br>
+                        <strong>Orbital period:</strong> 1 year (1 AU)<br><br>
+                        <strong>Stellar rotation:</strong> 60 days<br><br>
+                        <strong>Orbital plane:</strong> perpendicular to spin axis
+                    </div>
+                </div>
+            </div>
+
+            <div class="visuals-grid">
+                <div class="panel">
+                    <h3>Rotating Star (Observer's View)</h3>
+                    <canvas id="starCanvas" width="420" height="420"></canvas>
+                </div>
+                <div class="panel">
+                    <h3>Orbital System (Observer's View)</h3>
+                    <canvas id="orbitCanvas" width="420" height="420"></canvas>
+                </div>
+                <div class="panel trajectory-panel">
+                    <h3>X-Y Astrometric Trajectory</h3>
+                    <canvas id="trajectoryCanvas" width="920" height="320"></canvas>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ff6b6b;"></div>
+                            <span>Starspot Jitter</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #4ecdc4;"></div>
+                            <span>Planet Wobble</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #9b59b6;"></div>
+                            <span>Combined Signal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        // Physical scales (in units of stellar radii):
+        // - Earth at 1 AU causes Sun to wobble by ~450 km = 6.5e-4 R_sun
+        // - Starspot jitter: ~1e-4 R_star (quiet) to ~1e-2 R_star (active)
+        // We use normalized units where 1.0 = stellar radius for display
+        // Actual jitter values are computed from spot properties
+        const config = {
+            stellarRotationPeriod: 1,
+            planetOrbitalPeriod: 6,
+            totalDuration: 6,
+            fps: 60,
+            starRadius: 1.0,
+            // Earth-mass planet wobble in R_star units (exaggerated ~100x for visibility)
+            // Real value: ~6.5e-4 R_star, display value scaled up
+            planetWobbleAmplitude: 0.05,  // Display scale (real ~6.5e-4)
+            speedMultiplier: 0.15,
+            spotContrast: 0.7,
+            // Scale factor for jitter amplitude (adjusts spot effect strength)
+            // Real starspot jitter ~0.1-1% of R_star for active stars
+            jitterScaleFactor: 3.0,
+        };
+
+        // State
+        let state = {
+            time: 0,
+            playing: false,
+            animationId: null,
+            lastTimestamp: 0,
+            inclination: 90,  // Start edge-on
+            spotLatitude: 30,
+            spotRadius: 0.10,
+            jitterX: [],
+            jitterY: [],
+            wobbleX: [],
+            wobbleY: [],
+            times: [],
+        };
+
+        // Canvas contexts
+        const starCanvas = document.getElementById('starCanvas');
+        const orbitCanvas = document.getElementById('orbitCanvas');
+        const trajectoryCanvas = document.getElementById('trajectoryCanvas');
+
+        const starCtx = starCanvas.getContext('2d');
+        const orbitCtx = orbitCanvas.getContext('2d');
+        const trajectoryCtx = trajectoryCanvas.getContext('2d');
+
+        // Transform from star frame to observer frame
+        // Star frame: Z = spin axis (north pole)
+        // Observer frame: looking along +Y (into screen), X = right, Z = up
+        // Inclination i: angle between spin axis and line of sight
+        //   i = 0°: pole-on (north pole points at observer)
+        //   i = 90°: edge-on (north pole points up)
+        // North pole should map to (0, cos(i), sin(i)) in observer frame
+        function starToObserver(x_star, y_star, z_star, incRad) {
+            // Rotate around X-axis by (i - 90°) to tilt north pole toward observer
+            const angle = incRad - Math.PI / 2;
+            const cosA = Math.cos(angle);
+            const sinA = Math.sin(angle);
+
+            const x_obs = x_star;
+            const y_obs = y_star * cosA - z_star * sinA;
+            const z_obs = y_star * sinA + z_star * cosA;
+
+            return { x: x_obs, y: y_obs, z: z_obs };
+        }
+
+        // Get current rotation phase (longitude) in degrees
+        function getCurrentLongitude() {
+            const phase = (state.time / config.stellarRotationPeriod) % 1;
+            return (phase * 360) % 360;
+        }
+
+        // Precompute signal data
+        function computeSignals() {
+            const numPoints = 600;
+            state.times = [];
+            state.jitterX = [];
+            state.jitterY = [];
+            state.wobbleX = [];
+            state.wobbleY = [];
+
+            for (let i = 0; i <= numPoints; i++) {
+                const t = (i / numPoints) * config.totalDuration;
+                state.times.push(t);
+
+                const jitter = computeStarspotJitter(t);
+                state.jitterX.push(jitter.x);
+                state.jitterY.push(jitter.y);
+
+                const wobble = computePlanetWobble(t);
+                state.wobbleX.push(wobble.x);
+                state.wobbleY.push(wobble.y);
+            }
+        }
+
+        // Compute starspot-induced astrometric jitter
+        function computeStarspotJitter(time) {
+            const incRad = state.inclination * Math.PI / 180;
+            const latRad = state.spotLatitude * Math.PI / 180;
+            const rotPhase = (2 * Math.PI * time) / config.stellarRotationPeriod;
+
+            const spotX_star = Math.cos(latRad) * Math.cos(rotPhase);
+            const spotY_star = Math.cos(latRad) * Math.sin(rotPhase);
+            const spotZ_star = Math.sin(latRad);
+
+            const spot_obs = starToObserver(spotX_star, spotY_star, spotZ_star, incRad);
+
+            if (spot_obs.y < 0) {
+                return { x: 0, y: 0 };
+            }
+
+            // Photocenter displacement formula (based on Morris et al. 2009, Sowmya et al. 2021):
+            // δ/R_star ≈ f_spot * C * μ * geometric_factor
+            // where f_spot = spot fractional area, C = contrast, μ = cos(viewing angle)
+            const spotArea = Math.PI * state.spotRadius * state.spotRadius;  // fractional area
+            const contrast = config.spotContrast;
+            const mu = spot_obs.y;  // cos(angle from line of sight)
+            const limbDarkening = 0.4 + 0.6 * mu;  // linear limb darkening
+            const foreshortening = mu;
+
+            // Scale factor includes geometric effects and display scaling
+            // Real jitter is ~0.1-1% R_star for 10% spot on active star
+            const effectiveFactor = spotArea * contrast * limbDarkening * foreshortening * config.jitterScaleFactor;
+
+            return {
+                x: -spot_obs.x * effectiveFactor,
+                y: -spot_obs.z * effectiveFactor
+            };
+        }
+
+        // Compute planet-induced stellar wobble
+        function computePlanetWobble(time) {
+            const orbitalPhase = (2 * Math.PI * time) / config.planetOrbitalPeriod;
+            const incRad = state.inclination * Math.PI / 180;
+
+            const wobbleX_star = -config.planetWobbleAmplitude * Math.cos(orbitalPhase);
+            const wobbleY_star = -config.planetWobbleAmplitude * Math.sin(orbitalPhase);
+            const wobbleZ_star = 0;
+
+            const wobble_obs = starToObserver(wobbleX_star, wobbleY_star, wobbleZ_star, incRad);
+
+            return { x: wobble_obs.x, y: wobble_obs.z };
+        }
+
+        // Draw a circular spot on the sphere by sampling its boundary
+        function drawSpotOnSphere(ctx, cx, cy, r, spotLatRad, spotLonRad, spotAngularRadius, incRad) {
+            // Sample points around the spot boundary
+            const numPoints = 48;
+            const points = [];
+
+            for (let i = 0; i <= numPoints; i++) {
+                const angle = (i / numPoints) * 2 * Math.PI;
+
+                // Point on spot boundary in spot-local frame
+                // Spot center is at (spotLat, spotLon)
+                // We trace a small circle of angular radius spotAngularRadius
+                const cosR = Math.cos(spotAngularRadius);
+                const sinR = Math.sin(spotAngularRadius);
+
+                // Direction from spot center
+                const dx = sinR * Math.cos(angle);
+                const dy = sinR * Math.sin(angle);
+                const dz = cosR;
+
+                // Rotate this to the spot's position on the sphere
+                // First, the spot center in star frame
+                const centerLat = spotLatRad;
+                const centerLon = spotLonRad;
+
+                // Transform from spot-local to star frame
+                // Spot local: z points radially outward at spot center
+                // Need to rotate: first by latitude around Y, then by longitude around Z
+                const cosLat = Math.cos(centerLat);
+                const sinLat = Math.sin(centerLat);
+                const cosLon = Math.cos(centerLon);
+                const sinLon = Math.sin(centerLon);
+
+                // Rotate around Y by (90° - lat) to tilt from pole to correct latitude
+                // Then rotate around Z by lon
+                const x1 = dx * cosLat + dz * sinLat;
+                const y1 = dy;
+                const z1 = -dx * sinLat + dz * cosLat;
+
+                // Rotate around Z by longitude
+                const x_star = x1 * cosLon - y1 * sinLon;
+                const y_star = x1 * sinLon + y1 * cosLon;
+                const z_star = z1;
+
+                // Transform to observer frame
+                const obs = starToObserver(x_star, y_star, z_star, incRad);
+
+                if (obs.y > 0.001) {  // Visible
+                    points.push({
+                        x: cx + obs.x * r,
+                        y: cy - obs.z * r,
+                        visible: true
+                    });
+                } else {
+                    points.push({ visible: false });
+                }
+            }
+
+            // Draw the spot as a filled polygon
+            ctx.beginPath();
+            let started = false;
+            let hasVisiblePoints = false;
+
+            for (let i = 0; i < points.length; i++) {
+                if (points[i].visible) {
+                    hasVisiblePoints = true;
+                    if (!started) {
+                        ctx.moveTo(points[i].x, points[i].y);
+                        started = true;
+                    } else {
+                        ctx.lineTo(points[i].x, points[i].y);
+                    }
+                }
+            }
+
+            if (hasVisiblePoints) {
+                ctx.closePath();
+                const darkness = Math.floor(255 * (1 - config.spotContrast * 0.8));
+                ctx.fillStyle = `rgb(${darkness}, ${Math.floor(darkness * 0.7)}, ${Math.floor(darkness * 0.4)})`;
+                ctx.fill();
+            }
+
+            return hasVisiblePoints;
+        }
+
+        // Draw latitude/longitude grid on sphere
+        function drawSphereGrid(ctx, cx, cy, r, incRad, rotPhase) {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+            ctx.lineWidth = 0.8;
+
+            const latitudes = [0, 30, 60];
+            latitudes.forEach(latDeg => {
+                const latRad = latDeg * Math.PI / 180;
+                ctx.beginPath();
+                let started = false;
+                for (let lon = 0; lon <= 360; lon += 3) {
+                    const lonRad = lon * Math.PI / 180 + rotPhase;
+                    const x_star = Math.cos(latRad) * Math.cos(lonRad);
+                    const y_star = Math.cos(latRad) * Math.sin(lonRad);
+                    const z_star = Math.sin(latRad);
+
+                    const obs = starToObserver(x_star, y_star, z_star, incRad);
+
+                    if (obs.y > 0) {
+                        const screenX = cx + obs.x * r;
+                        const screenY = cy - obs.z * r;
+                        if (!started) {
+                            ctx.moveTo(screenX, screenY);
+                            started = true;
+                        } else {
+                            ctx.lineTo(screenX, screenY);
+                        }
+                    } else {
+                        started = false;
+                    }
+                }
+                ctx.stroke();
+            });
+
+            for (let lonDeg = 0; lonDeg < 360; lonDeg += 30) {
+                const lonRad = lonDeg * Math.PI / 180 + rotPhase;
+                ctx.beginPath();
+                let started = false;
+                for (let lat = -90; lat <= 90; lat += 3) {
+                    const latRad = lat * Math.PI / 180;
+                    const x_star = Math.cos(latRad) * Math.cos(lonRad);
+                    const y_star = Math.cos(latRad) * Math.sin(lonRad);
+                    const z_star = Math.sin(latRad);
+
+                    const obs = starToObserver(x_star, y_star, z_star, incRad);
+
+                    if (obs.y > 0) {
+                        const screenX = cx + obs.x * r;
+                        const screenY = cy - obs.z * r;
+                        if (!started) {
+                            ctx.moveTo(screenX, screenY);
+                            started = true;
+                        } else {
+                            ctx.lineTo(screenX, screenY);
+                        }
+                    } else {
+                        started = false;
+                    }
+                }
+                ctx.stroke();
+            }
+        }
+
+        // Draw the rotating star
+        function drawStar() {
+            const ctx = starCtx;
+            const w = starCanvas.width;
+            const h = starCanvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+            const r = 160;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const incRad = state.inclination * Math.PI / 180;
+            const latRad = state.spotLatitude * Math.PI / 180;
+            const rotPhase = (2 * Math.PI * state.time) / config.stellarRotationPeriod;
+
+            // Draw star disk with limb darkening
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+            gradient.addColorStop(0, '#fff5e6');
+            gradient.addColorStop(0.7, '#ffd699');
+            gradient.addColorStop(0.9, '#ffb347');
+            gradient.addColorStop(1, '#cc7a00');
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Draw sphere grid
+            drawSphereGrid(ctx, cx, cy, r, incRad, rotPhase);
+
+            // Draw spot using proper spherical projection
+            const spotAngularRadius = state.spotRadius * Math.PI / 2;  // Convert to radians
+            const spotVisible = drawSpotOnSphere(ctx, cx, cy, r, latRad, rotPhase, spotAngularRadius, incRad);
+
+            // Get spot center position for annotations
+            const spotX_star = Math.cos(latRad) * Math.cos(rotPhase);
+            const spotY_star = Math.cos(latRad) * Math.sin(rotPhase);
+            const spotZ_star = Math.sin(latRad);
+            const spot_obs = starToObserver(spotX_star, spotY_star, spotZ_star, incRad);
+
+            if (spot_obs.y > 0) {
+                const screenX = cx + spot_obs.x * r;
+                const screenY = cy - spot_obs.z * r;
+
+                // Draw latitude arc from equator to spot
+                ctx.strokeStyle = '#e74c3c';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 3]);
+                ctx.beginPath();
+                let started = false;
+                for (let lat = 0; lat <= state.spotLatitude; lat += 2) {
+                    const lr = lat * Math.PI / 180;
+                    const px = Math.cos(lr) * Math.cos(rotPhase);
+                    const py = Math.cos(lr) * Math.sin(rotPhase);
+                    const pz = Math.sin(lr);
+                    const p_obs = starToObserver(px, py, pz, incRad);
+                    if (p_obs.y > 0) {
+                        const sx = cx + p_obs.x * r;
+                        const sy = cy - p_obs.z * r;
+                        if (!started) {
+                            ctx.moveTo(sx, sy);
+                            started = true;
+                        } else {
+                            ctx.lineTo(sx, sy);
+                        }
+                    }
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Draw λ label
+                const midLat = state.spotLatitude / 2 * Math.PI / 180;
+                const midX = Math.cos(midLat) * Math.cos(rotPhase);
+                const midY = Math.cos(midLat) * Math.sin(rotPhase);
+                const midZ = Math.sin(midLat);
+                const mid_obs = starToObserver(midX, midY, midZ, incRad);
+                if (mid_obs.y > 0) {
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.font = 'bold 14px sans-serif';
+                    ctx.fillText('λ', cx + mid_obs.x * r + 8, cy - mid_obs.z * r);
+                }
+            }
+
+            // Draw prime meridian (longitude = 0)
+            ctx.strokeStyle = '#2ecc71';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            let started = false;
+            for (let lat = -90; lat <= 90; lat += 3) {
+                const lr = lat * Math.PI / 180;
+                const px = Math.cos(lr) * Math.cos(rotPhase);
+                const py = Math.cos(lr) * Math.sin(rotPhase);
+                const pz = Math.sin(lr);
+                const p_obs = starToObserver(px, py, pz, incRad);
+                if (p_obs.y > 0) {
+                    const sx = cx + p_obs.x * r;
+                    const sy = cy - p_obs.z * r;
+                    if (!started) {
+                        ctx.moveTo(sx, sy);
+                        started = true;
+                    } else {
+                        ctx.lineTo(sx, sy);
+                    }
+                } else {
+                    started = false;
+                }
+            }
+            ctx.stroke();
+
+            // φ label
+            const eqX = Math.cos(rotPhase);
+            const eqY = Math.sin(rotPhase);
+            const eq_obs = starToObserver(eqX, eqY, 0, incRad);
+            if (eq_obs.y > 0.1) {
+                ctx.fillStyle = '#2ecc71';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillText('φ=0°', cx + eq_obs.x * r + 8, cy - eq_obs.z * r + 5);
+            }
+
+            // Draw spin axis arrow from center to visible pole
+            // Pole in observer frame: (0, cos(i), sin(i))
+            // poleZ_obs = sin(i) is the height on screen
+            // poleY_obs = cos(i) is how much it points toward observer
+            const poleZ_obs = Math.sin(incRad);  // Vertical position of pole on screen
+
+            ctx.strokeStyle = '#64b5f6';
+            ctx.fillStyle = '#64b5f6';
+            ctx.lineWidth = 2.5;
+
+            if (state.inclination < 10) {
+                // Nearly pole-on: draw circle with dot
+                ctx.beginPath();
+                ctx.arc(cx, cy, 12, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Spin axis (toward you)', cx, cy - 22);
+            } else {
+                // Arrow from center to pole position
+                // The pole appears at height poleZ_obs on the unit sphere
+                const arrowEndY = cy - poleZ_obs * r;
+
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(cx, arrowEndY);
+                ctx.stroke();
+
+                // Arrowhead
+                const headLen = 10;
+                ctx.beginPath();
+                ctx.moveTo(cx, arrowEndY);
+                ctx.lineTo(cx - headLen * 0.6, arrowEndY + headLen);
+                ctx.lineTo(cx + headLen * 0.6, arrowEndY + headLen);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Spin axis', cx, arrowEndY - 8);
+            }
+
+            // Draw equator (highlighted)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            started = false;
+            for (let lon = 0; lon <= 360; lon += 3) {
+                const lonRad = lon * Math.PI / 180 + rotPhase;
+                const x_star = Math.cos(lonRad);
+                const y_star = Math.sin(lonRad);
+
+                const obs = starToObserver(x_star, y_star, 0, incRad);
+
+                if (obs.y > 0) {
+                    const screenX = cx + obs.x * r;
+                    const screenY = cy - obs.z * r;
+                    if (!started) {
+                        ctx.moveTo(screenX, screenY);
+                        started = true;
+                    } else {
+                        ctx.lineTo(screenX, screenY);
+                    }
+                } else {
+                    started = false;
+                }
+            }
+            ctx.stroke();
+        }
+
+        // Draw the orbital system at the same inclination as star
+        function drawOrbit() {
+            const ctx = orbitCtx;
+            const w = orbitCanvas.width;
+            const h = orbitCanvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const incRad = state.inclination * Math.PI / 180;
+            const orbitalPhase = (2 * Math.PI * state.time) / config.planetOrbitalPeriod;
+
+            // Orbit parameters (in star frame, orbit is in X-Y plane)
+            const orbitRadius = 130;  // Display radius
+            const starWobbleRadius = 2;  // Exaggerated for visibility, but smaller
+
+            // Draw orbit ellipse (projected based on inclination)
+            // At edge-on (i=90°), orbit appears as a horizontal line
+            // At pole-on (i=0°), orbit appears as a circle
+            ctx.strokeStyle = 'rgba(78, 205, 196, 0.4)';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+
+            for (let angle = 0; angle <= 360; angle += 3) {
+                const a = angle * Math.PI / 180;
+                const x_star = orbitRadius * Math.cos(a);
+                const y_star = orbitRadius * Math.sin(a);
+                const z_star = 0;
+
+                const obs = starToObserver(x_star, y_star, z_star, incRad);
+
+                const screenX = cx + obs.x;
+                const screenY = cy - obs.z;
+
+                if (angle === 0) {
+                    ctx.moveTo(screenX, screenY);
+                } else {
+                    ctx.lineTo(screenX, screenY);
+                }
+            }
+            ctx.closePath();
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Calculate positions
+            const planetX_star = orbitRadius * Math.cos(orbitalPhase);
+            const planetY_star = orbitRadius * Math.sin(orbitalPhase);
+            const planet_obs = starToObserver(planetX_star, planetY_star, 0, incRad);
+
+            const starX_star = -starWobbleRadius * Math.cos(orbitalPhase);
+            const starY_star = -starWobbleRadius * Math.sin(orbitalPhase);
+            const star_obs = starToObserver(starX_star, starY_star, 0, incRad);
+
+            const planetScreenX = cx + planet_obs.x;
+            const planetScreenY = cy - planet_obs.z;
+            const starScreenX = cx + star_obs.x;
+            const starScreenY = cy - star_obs.z;
+
+            // Determine if planet is in front or behind
+            const planetInFront = planet_obs.y > 0;
+
+            // Draw barycenter
+            ctx.fillStyle = '#888';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw connecting line
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(planetScreenX, planetScreenY);
+            ctx.lineTo(starScreenX, starScreenY);
+            ctx.stroke();
+
+            // Draw star
+            const starDisplayRadius = 35;
+            const starGradient = ctx.createRadialGradient(starScreenX, starScreenY, 0, starScreenX, starScreenY, starDisplayRadius);
+            starGradient.addColorStop(0, '#fff5e6');
+            starGradient.addColorStop(0.6, '#ffd699');
+            starGradient.addColorStop(1, '#ffb347');
+
+            ctx.beginPath();
+            ctx.arc(starScreenX, starScreenY, starDisplayRadius, 0, Math.PI * 2);
+            ctx.fillStyle = starGradient;
+            ctx.fill();
+
+            // Draw planet (with depth indication)
+            const planetDisplayRadius = planetInFront ? 9 : 7;
+            ctx.globalAlpha = planetInFront ? 1.0 : 0.5;
+            ctx.beginPath();
+            ctx.arc(planetScreenX, planetScreenY, planetDisplayRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#4ecdc4';
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+
+            // Labels
+            ctx.fillStyle = '#aaa';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'left';
+
+            // Planet label with depth indicator
+            const depthText = planetInFront ? '' : ' (behind)';
+            ctx.fillText('Earth-mass planet' + depthText, planetScreenX + 12, planetScreenY + 4);
+
+            // Star label (positioned higher to avoid barycenter overlap)
+            ctx.fillText('Sun-like star', starScreenX + starDisplayRadius + 5, starScreenY - 15);
+
+            // Draw 1 AU annotation - aligned with left half of orbit
+            ctx.strokeStyle = '#64b5f6';
+            ctx.fillStyle = '#64b5f6';
+            ctx.lineWidth = 1;
+            ctx.font = '11px sans-serif';
+
+            // Scale bar from center to left edge of orbit (= 1 AU = orbit radius)
+            const scaleY = h - 45;
+            const scaleLeft = cx - orbitRadius;
+            const scaleRight = cx;
+
+            ctx.beginPath();
+            ctx.moveTo(scaleLeft, scaleY);
+            ctx.lineTo(scaleRight, scaleY);
+            ctx.stroke();
+
+            // End caps
+            ctx.beginPath();
+            ctx.moveTo(scaleLeft, scaleY - 5);
+            ctx.lineTo(scaleLeft, scaleY + 5);
+            ctx.moveTo(scaleRight, scaleY - 5);
+            ctx.lineTo(scaleRight, scaleY + 5);
+            ctx.stroke();
+
+            // Label offset to the left
+            ctx.textAlign = 'center';
+            ctx.fillText('1 AU', (scaleLeft + scaleRight) / 2, scaleY - 8);
+
+            // Barycenter label
+            ctx.fillStyle = '#666';
+            ctx.font = '9px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Barycenter', cx + 6, cy + 3);
+
+            // Inclination indicator
+            ctx.fillStyle = '#888';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Inclination: ${state.inclination}°`, cx, 25);
+
+            // Observer direction (only makes sense for inclined views)
+            if (state.inclination > 20) {
+                ctx.fillStyle = '#64b5f6';
+                ctx.font = '10px sans-serif';
+                ctx.fillText('↓ Observer', cx, h - 15);
+            }
+        }
+
+        // Draw trajectory plot
+        function drawTrajectory() {
+            const ctx = trajectoryCtx;
+            const w = trajectoryCanvas.width;
+            const h = trajectoryCanvas.height;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const plotSize = 240;
+            const margin = 55;
+            const gap = 55;
+
+            const plots = [
+                { title: 'Starspot Jitter', dataX: state.jitterX, dataY: state.jitterY, color: '#ff6b6b' },
+                { title: 'Planet Wobble', dataX: state.wobbleX, dataY: state.wobbleY, color: '#4ecdc4' },
+                { title: 'Combined', dataX: state.jitterX.map((j, i) => j + state.wobbleX[i]),
+                  dataY: state.jitterY.map((j, i) => j + state.wobbleY[i]), color: '#9b59b6' }
+            ];
+
+            const allX = [...state.jitterX, ...state.wobbleX];
+            const allY = [...state.jitterY, ...state.wobbleY];
+            const combinedX = state.jitterX.map((j, i) => j + state.wobbleX[i]);
+            const combinedY = state.jitterY.map((j, i) => j + state.wobbleY[i]);
+            allX.push(...combinedX);
+            allY.push(...combinedY);
+
+            const maxVal = Math.max(
+                Math.max(...allX.map(Math.abs)),
+                Math.max(...allY.map(Math.abs))
+            ) * 1.3 || 0.1;
+
+            plots.forEach((plot, idx) => {
+                const plotCx = margin + plotSize / 2 + idx * (plotSize + gap);
+                const plotCy = h / 2 + 10;
+
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(plotCx - plotSize/2, plotCy - plotSize/2, plotSize, plotSize);
+
+                ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(plotCx - plotSize/2, plotCy);
+                ctx.lineTo(plotCx + plotSize/2, plotCy);
+                ctx.moveTo(plotCx, plotCy - plotSize/2);
+                ctx.lineTo(plotCx, plotCy + plotSize/2);
+                ctx.stroke();
+
+                ctx.strokeStyle = plot.color;
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = 0.6;
+                ctx.beginPath();
+                for (let i = 0; i < plot.dataX.length; i++) {
+                    const x = plotCx + (plot.dataX[i] / maxVal) * (plotSize / 2);
+                    const y = plotCy - (plot.dataY[i] / maxVal) * (plotSize / 2);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+
+                const currentIdx = Math.floor((state.time / config.totalDuration) * (plot.dataX.length - 1));
+                const currX = plotCx + (plot.dataX[currentIdx] / maxVal) * (plotSize / 2);
+                const currY = plotCy - (plot.dataY[currentIdx] / maxVal) * (plotSize / 2);
+
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(currX, currY, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#aaa';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(plot.title, plotCx, plotCy - plotSize/2 - 12);
+
+                ctx.font = '10px sans-serif';
+                ctx.fillText('x photocenter', plotCx + plotSize/2 - 25, plotCy + plotSize/2 + 18);
+                ctx.save();
+                ctx.translate(plotCx - plotSize/2 - 12, plotCy);
+                ctx.rotate(-Math.PI / 2);
+                ctx.fillText('y photocenter', 0, 0);
+                ctx.restore();
+            });
+        }
+
+        // Animation loop
+        function animate(timestamp) {
+            if (!state.playing) return;
+
+            if (state.lastTimestamp === 0) {
+                state.lastTimestamp = timestamp;
+            }
+
+            const dt = (timestamp - state.lastTimestamp) / 1000;
+            state.lastTimestamp = timestamp;
+
+            state.time += dt * config.speedMultiplier;
+            if (state.time >= config.totalDuration) {
+                state.time = state.time % config.totalDuration;
+            }
+
+            render();
+            state.animationId = requestAnimationFrame(animate);
+        }
+
+        function render() {
+            drawStar();
+            drawOrbit();
+            drawTrajectory();
+            updateTimeDisplay();
+        }
+
+        function updateTimeDisplay() {
+            document.getElementById('timeDisplay').textContent = state.time.toFixed(2);
+            document.getElementById('lonDisplay').textContent = Math.round(getCurrentLongitude());
+        }
+
+        // Event handlers
+        document.getElementById('playPause').addEventListener('click', function() {
+            state.playing = !state.playing;
+            this.textContent = state.playing ? '⏸ Pause' : '▶ Play';
+            if (state.playing) {
+                state.lastTimestamp = 0;
+                state.animationId = requestAnimationFrame(animate);
+            } else {
+                cancelAnimationFrame(state.animationId);
+            }
+        });
+
+        document.getElementById('reset').addEventListener('click', function() {
+            state.time = 0;
+            render();
+        });
+
+        document.getElementById('speedDown').addEventListener('click', function() {
+            config.speedMultiplier = Math.max(0.05, config.speedMultiplier / 2);
+            this.textContent = (config.speedMultiplier / 0.15).toFixed(1) + 'x';
+        });
+
+        document.getElementById('speedUp').addEventListener('click', function() {
+            config.speedMultiplier = Math.min(1.5, config.speedMultiplier * 2);
+            this.textContent = (config.speedMultiplier / 0.15).toFixed(1) + 'x';
+        });
+
+        document.getElementById('inclination').addEventListener('input', function() {
+            state.inclination = parseFloat(this.value);
+            document.getElementById('incValue').textContent = this.value;
+            computeSignals();
+            render();
+        });
+
+        document.getElementById('spotLat').addEventListener('input', function() {
+            state.spotLatitude = parseFloat(this.value);
+            document.getElementById('spotLatValue').textContent = this.value;
+            computeSignals();
+            render();
+        });
+
+        document.getElementById('spotRadius').addEventListener('input', function() {
+            state.spotRadius = parseFloat(this.value) / 100;
+            document.getElementById('spotRadiusValue').textContent = this.value;
+            computeSignals();
+            render();
+        });
+
+        // Initialize
+        computeSignals();
+        render();
+    </script>
+</body>
+</html>
