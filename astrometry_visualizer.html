@@ -939,8 +939,8 @@
             const gap = 50;
 
             const plots = [
-                { title: 'Starspot Jitter', dataX: state.jitterX, dataY: state.jitterY, color: '#ff6b6b' },
-                { title: 'Planet Wobble', dataX: state.wobbleX, dataY: state.wobbleY, color: '#4ecdc4' },
+                { title: 'Starspot jitter', dataX: state.jitterX, dataY: state.jitterY, color: '#ff6b6b' },
+                { title: 'Stellar wobble (induced by planet)', dataX: state.wobbleX, dataY: state.wobbleY, color: '#4ecdc4' },
                 { title: 'Combined', dataX: state.jitterX.map((j, i) => j + state.wobbleX[i]),
                   dataY: state.jitterY.map((j, i) => j + state.wobbleY[i]), color: '#9b59b6' }
             ];
