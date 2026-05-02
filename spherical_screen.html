@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reconstructing stars on a spherical screen — Jamila Taaki</title>
+  <link rel="stylesheet" href="bla.css" />
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 2em auto; padding: 0 1em; line-height: 1.5; color: #222; }
+    h1 { font-size: 1.6em; }
+    video { width: 100%; max-width: 720px; display: block; margin: 1em auto; border-radius: 6px; }
+    a { color: #06c; }
+    nav a { margin-right: 1em; }
+  </style>
+</head>
+<body>
+  <nav><a href="index.html">&larr; Back to home</a></nav>
+  <h1>Reconstructing stars on a spherical screen</h1>
+
+  <p>
+    A tabletop demo of stellar-surface reconstruction running on a Gakken WorldEye
+    hemispherical projection display, driven by a Raspberry Pi with a custom
+    rendering stack (direct framebuffer drawing, real-time spherical-harmonic
+    synthesis, calibrated against the dome's azimuthal-equidistant projection).
+  </p>
+
+  <video controls poster="gakken_thumb.png">
+    <source src="gakken_demo.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <p>
+    The exhibit lets a viewer watch a rotating spotted star and a reconstructed
+    stellar surface fill in over time &mdash; a tactile entry point into how
+    astrometric measurements of a star's photocenter wobble can be inverted to
+    map an unresolved surface. The demo has been shown at the Electronic Imaging
+    2026 conference and through the University of Michigan's NSF Science
+    Communication Fellows program.
+  </p>
+
+  <p>
+    Code, calibration utilities, and a hardware bill of materials will be
+    released so other researchers and educators can adapt the platform for
+    their own work.
+  </p>
+</body>
+</html>
