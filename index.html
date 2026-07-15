@@ -99,9 +99,19 @@
       <a class="btn" href="Jamila_CV.pdf">Download CV (PDF)</a>
       <a class="btn" href="research_statement.pdf">Research Statement (PDF)</a>
     </p>
-    <hr style="margin:1.25rem 0;border:none;border-top:1px solid #eee">
-    <p style="margin:.25rem 0">
-      <a id="askbot-open" href="#askbot" style="display:inline-block;padding:.5rem .95rem;border-radius:999px;border:1px dashed #888;background:#fafafa;text-decoration:none;color:#111;cursor:pointer;font-size:.95rem">🤖 Talk to Jamila&nbsp;Bot™</a>
+    <hr>
+    <p style="margin:1rem 0 .25rem">
+      <a id="askbot-open" href="#askbot" style="position:relative;display:inline-block;padding:.5rem 1rem;border-radius:999px;border:1px solid #888;background:#fafafa;text-decoration:none;color:#111;cursor:pointer;font-size:.95rem">
+        <span aria-hidden="true" style="position:absolute;left:50%;top:-7px;transform:translateX(-50%);display:flex;gap:12px;pointer-events:none">
+          <span style="position:relative;width:2px;height:7px;background:#888;border-radius:1px">
+            <span style="position:absolute;top:-5px;left:-2px;width:6px;height:6px;border-radius:50%;background:#888"></span>
+          </span>
+          <span style="position:relative;width:2px;height:7px;background:#888;border-radius:1px">
+            <span style="position:absolute;top:-5px;left:-2px;width:6px;height:6px;border-radius:50%;background:#888"></span>
+          </span>
+        </span>
+        Talk to Jamila&nbsp;Bot™
+      </a>
     </p>
     <!-- Jamila Bot: research Q&A over a curated, public corpus. Backend on Vercel. -->
     <section id="askbot" style="display:none;margin:1rem 0;max-width:640px">
@@ -109,10 +119,7 @@
         Ask Jamila&nbsp;Bot questions — 3 a day, sign in with GitHub.
       </p>
       <p style="color:#777;font-size:.82rem;font-style:italic;margin:.4rem 0 .8rem">
-        Disclaimer: Jamila&nbsp;Bot is an AI that has read some of Jamila's research notes.
-        It is not Jamila, it has never seen a star, and it will not do your problem set.
-        It knows nothing about her life, opinions, or whereabouts, and it is occasionally
-        confidently wrong. Treat it as a well-read parrot, not a primary source.
+        All thoughts and opinions are the property of Anthropic™.
       </p>
       <div id="askbot-body"></div>
     </section>
