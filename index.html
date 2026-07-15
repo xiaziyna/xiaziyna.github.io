@@ -99,6 +99,115 @@
       <a class="btn" href="Jamila_CV.pdf">Download CV (PDF)</a>
       <a class="btn" href="research_statement.pdf">Research Statement (PDF)</a>
     </p>
+    <p class="cta">
+      <a class="btn" id="askbot-open" href="#askbot" style="cursor:pointer">Talk to Jamila Bot</a>
+    </p>
+    <!-- Jamila Bot: research Q&A over a curated, public corpus. Backend on Vercel. -->
+    <section id="askbot" style="display:none;margin:1rem 0;max-width:640px">
+      <p style="color:#555;font-size:.9rem;margin:.4rem 0">
+        A bot that answers questions about the inner workings of my research and
+        the ideas I think about. Sign in with GitHub (identity only, no repo access),
+        3 questions per day. Questions may be logged. It only knows what I've chosen
+        to teach it, and it can be wrong.
+      </p>
+      <div id="askbot-body"></div>
+    </section>
+    <script>
+    (function () {
+      var BOT_API = "https://jamila-bot.vercel.app";
+      var openBtn = document.getElementById("askbot-open");
+      var section = document.getElementById("askbot");
+      var body = document.getElementById("askbot-body");
+
+      var m = location.hash.match(/token=([^&]+)/);
+      var fresh = false;
+      if (m) {
+        sessionStorage.setItem("askbot_token", m[1]);
+        history.replaceState(null, "", location.pathname + location.search);
+        fresh = true;
+      }
+
+      function el(tag, attrs, text) {
+        var e = document.createElement(tag);
+        for (var k in attrs || {}) e.setAttribute(k, attrs[k]);
+        if (text) e.textContent = text;
+        return e;
+      }
+
+      function render() {
+        body.innerHTML = "";
+        var token = sessionStorage.getItem("askbot_token");
+        if (!token) {
+          body.appendChild(el("a", {
+            href: BOT_API + "/api/auth/github",
+            class: "btn", style: "cursor:pointer",
+          }, "Sign in with GitHub to ask"));
+          return;
+        }
+        var form = el("form", { style: "display:flex;gap:.5rem;flex-wrap:wrap" });
+        var input = el("input", {
+          type: "text", maxlength: "1000",
+          placeholder: "e.g. How does astrometry break mapping degeneracies?",
+          style: "flex:1;min-width:240px;padding:.6rem;border:1px solid #aaa;font:inherit",
+        });
+        var btn = el("button", {
+          type: "submit", class: "btn",
+          style: "cursor:pointer;background:#fff;font:inherit",
+        }, "Ask");
+        var meta = el("div", { style: "color:#555;font-size:.85rem;margin:.4rem 0" });
+        var out = el("div", {
+          style: "white-space:pre-wrap;border:1px solid #eee;background:#fafafa;padding:.75rem;margin-top:.6rem;min-height:2rem;display:none",
+        });
+        form.appendChild(input); form.appendChild(btn);
+        body.appendChild(form); body.appendChild(meta); body.appendChild(out);
+        input.focus();
+
+        form.addEventListener("submit", async function (ev) {
+          ev.preventDefault();
+          var q = input.value.trim();
+          if (!q) return;
+          btn.disabled = true; out.style.display = "block"; out.textContent = "…";
+          try {
+            var res = await fetch(BOT_API + "/api/ask", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+              body: JSON.stringify({ question: q }),
+            });
+            if (res.status === 401) {
+              sessionStorage.removeItem("askbot_token");
+              out.textContent = "Session expired — sign in again.";
+              render();
+              return;
+            }
+            if (res.status === 429) {
+              var j = await res.json();
+              out.textContent = j.message || "Out of questions for today.";
+              meta.textContent = "";
+              return;
+            }
+            var rem = res.headers.get("X-Questions-Remaining");
+            if (rem !== null) meta.textContent = rem + " of 3 questions left today";
+            out.textContent = "";
+            var reader = res.body.getReader();
+            var dec = new TextDecoder();
+            for (;;) {
+              var chunk = await reader.read();
+              if (chunk.done) break;
+              out.textContent += dec.decode(chunk.value, { stream: true });
+            }
+          } catch (e) {
+            out.textContent = "Something went wrong — try again.";
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      }
+
+      function open() { section.style.display = "block"; render(); }
+      openBtn.addEventListener("click", function (ev) { ev.preventDefault(); open(); });
+      if (fresh) open();
+    })();
+    </script>
   </header>
 
   <main class="container">
