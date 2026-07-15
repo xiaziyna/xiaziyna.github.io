@@ -79,7 +79,25 @@
 
   <header class="header container">
     <img src="headshot.jpeg" alt="Portrait of Jamila Taaki" loading="lazy" />
-    <h1>Jamila Taaki</h1>
+    <div style="display:flex;align-items:center;gap:.85rem;flex-wrap:wrap">
+      <h1 style="margin:0">Jamila Taaki</h1>
+      <a id="askbot-open" href="#askbot" style="position:relative;display:inline-block;padding:.45rem .95rem;border-radius:999px;border:1px solid #888;background:#fafafa;text-decoration:none;color:#111;cursor:pointer">
+        <span aria-hidden="true" style="position:absolute;left:50%;top:-7px;transform:translateX(-50%);display:flex;gap:12px;pointer-events:none">
+          <span style="position:relative;width:2px;height:7px;background:#888;border-radius:1px"><span style="position:absolute;top:-5px;left:-2px;width:6px;height:6px;border-radius:50%;background:#888"></span></span>
+          <span style="position:relative;width:2px;height:7px;background:#888;border-radius:1px"><span style="position:absolute;top:-5px;left:-2px;width:6px;height:6px;border-radius:50%;background:#888"></span></span>
+        </span>
+        Talk to Jamila&nbsp;Bot™
+      </a>
+    </div>
+    <section id="askbot" style="display:none;margin:.7rem 0 0;max-width:620px">
+      <p style="color:#333;font-size:.95rem;margin:.4rem 0">
+        3 questions a day, sign in with GitHub and ask away…
+      </p>
+      <p style="color:#777;font-size:.82rem;font-style:italic;margin:.4rem 0 .8rem">
+        All thoughts and opinions are the property of Anthropic™.
+      </p>
+      <div id="askbot-body"></div>
+    </section>
     <p class="tagline">Statistical inference &amp; computational methods for exoplanets</p>
     <p>
       I'm a Schmidt Postdoctoral Fellow at the
@@ -99,30 +117,6 @@
       <a class="btn" href="Jamila_CV.pdf">Download CV (PDF)</a>
       <a class="btn" href="research_statement.pdf">Research Statement (PDF)</a>
     </p>
-    <hr>
-    <p style="margin:1rem 0 .25rem">
-      <a id="askbot-open" href="#askbot" style="position:relative;display:inline-block;padding:.5rem 1rem;border-radius:999px;border:1px solid #888;background:#fafafa;text-decoration:none;color:#111;cursor:pointer">
-        <span aria-hidden="true" style="position:absolute;left:50%;top:-7px;transform:translateX(-50%);display:flex;gap:12px;pointer-events:none">
-          <span style="position:relative;width:2px;height:7px;background:#888;border-radius:1px">
-            <span style="position:absolute;top:-5px;left:-2px;width:6px;height:6px;border-radius:50%;background:#888"></span>
-          </span>
-          <span style="position:relative;width:2px;height:7px;background:#888;border-radius:1px">
-            <span style="position:absolute;top:-5px;left:-2px;width:6px;height:6px;border-radius:50%;background:#888"></span>
-          </span>
-        </span>
-        Talk to Jamila&nbsp;Bot™
-      </a>
-    </p>
-    <!-- Jamila Bot: research Q&A over a curated, public corpus. Backend on Vercel. -->
-    <section id="askbot" style="display:none;margin:1rem 0;max-width:640px">
-      <p style="color:#333;font-size:.95rem;margin:.4rem 0">
-        Ask Jamila&nbsp;Bot questions — 3 a day, sign in with GitHub.
-      </p>
-      <p style="color:#777;font-size:.82rem;font-style:italic;margin:.4rem 0 .8rem">
-        All thoughts and opinions are the property of Anthropic™.
-      </p>
-      <div id="askbot-body"></div>
-    </section>
     <script>
     (function () {
       var BOT_API = "https://jamila-bot.vercel.app";
