@@ -590,11 +590,10 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
     loadPile();
     const forming = root.classList.contains('lf-forming');
     if (PAGE === 'home') {
-      // play on the first visit of a session and on every refresh, but not when arriving at a section link
+      // whether to play was decided in the page head (every visit and refresh, not when coming back from a project)
       const nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
       const reloaded = nav ? nav.type === 'reload' : false;
-      if (!forming || (location.hash && !reloaded)) { showSite(false); draw(); return; }
-      store.set('lf-seen', 1);
+      if (!forming) { showSite(false); draw(); return; }
       // a refresh starts over from the top, even if the address still ends in #projects
       if (reloaded && location.hash) history.replaceState(null, '', location.pathname + location.search);
       scrollTo(0, 0);
