@@ -4,68 +4,25 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="google-site-verification" content="f5THJ7_Vj5p_7kY1gBx-r7dpL771oLGP13bdGP1QQu4" />
-  <title>Jamila Taaki — Astrophysics & Signal Processing</title>
-  <meta name="description" content="Statistical inference & computational imaging for exoplanets: transits, starshades, and astrometry." />
   <meta property="og:title" content="Jamila Taaki" />
   <meta property="og:description" content="Exoplanet inference, starshade optics, astrometry." />
   <meta property="og:image" content="headshot.jpeg" />
-  <link rel="stylesheet" href="bla.css" />
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.55;color:#111}
-    .container{max-width:820px;margin:0 auto;padding:0 1rem}
-    .topnav{position:sticky;top:0;background:#fff;border-bottom:1px solid #eee;z-index:10}
-    .topnav .container{display:flex;gap:1rem;align-items:center;padding:.6rem 1rem}
-    .topnav a{text-decoration:none;color:#111}
-    .topnav a:hover{text-decoration:underline}
-    .header{padding:2rem 0}
-    .header img{float:right;margin-left:1rem;width:180px;height:180px;object-fit:cover}
-    .tagline{margin-top:-.25rem;color:#444}
-    .cta{margin:.75rem 0 0 0;display:flex;gap:.6rem;flex-wrap:wrap}
-    .btn{display:inline-block;padding:.6rem 1rem;border:1px solid #000;text-decoration:none}
-    .btn:hover{background:#000;color:#fff}
-    .btn-secondary{display:inline-block;padding:.6rem 1rem;border:1px solid #aaa;text-decoration:none;color:#111}
-    .btn-secondary:hover{background:#111;color:#fff;border-color:#111}
-    h2{margin-top:2rem}
-    ul.pubs{list-style:none;padding-left:0}
-    ul.pubs li{margin:.6rem 0}
-    .yr{display:inline-block;min-width:3ch;font-variant-numeric:tabular-nums;color:#555}
-    footer{margin:2rem 0 3rem}
-    @media (max-width:600px){
-      .header img{float:none;margin:1rem 0 0 0;width:120px;height:120px}
-    }
-
-    /* Project grid – 2 cards per row, image on top */
-    .project-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-      gap:1.5rem;
-      margin-top:1.5rem;
-    }
-    .project-card{
-      border:1px solid #eee;
-      padding:.75rem;
-      background:#fafafa;
-      width:100%;
-      display:flex;
-      flex-direction:column;
-    }
-    .project-card img{
-      width:100%;
-      height:auto;
-      display:block;
-      margin:0 0 .5rem 0;
-    }
-    .project-card h3{
-      margin:.25rem 0 .35rem 0;
-      font-size:1.02rem;
-    }
-    .project-card p{
-      margin:.1rem 0;
-      font-size:0.92rem;
-    }
-  </style>
+  <title>Jamila Taaki — Astrophysics &amp; Signal Processing</title>
+  <meta name="description" content="Signal processing for exoplanet detection and imaging: transits, starshades, and astrometry." />
+  <script>
+    // Hide the page until the letter animation takes over (failsafe: always shown after 6 s).
+    (function () {
+      try {
+        var d = document.documentElement, s = window.sessionStorage;
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (!s.getItem('lf-seen')) { d.classList.add('lf-forming'); setTimeout(function () { d.classList.remove('lf-forming'); }, 6000); }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/site.css" />
 </head>
-<body>
+<body data-page="home">
+<div id="site">
   <nav class="topnav">
     <div class="container">
       <a href="Jamila_CV.pdf"><strong>CV (PDF)</strong></a>
@@ -78,27 +35,9 @@
   </nav>
 
   <header class="header container">
-    <img src="headshot.jpeg" alt="Portrait of Jamila Taaki" loading="lazy" />
-    <div style="display:flex;align-items:center;gap:.85rem;flex-wrap:wrap">
-      <h1 style="margin:0">Jamila Taaki</h1>
-      <a id="askbot-open" href="#askbot" style="position:relative;display:inline-block;padding:.45rem .95rem;border-radius:999px;border:1px solid #888;background:#fafafa;text-decoration:none;color:#111;cursor:pointer">
-        <span aria-hidden="true" style="position:absolute;left:50%;top:-7px;transform:translateX(-50%);display:flex;gap:12px;pointer-events:none">
-          <span style="position:relative;width:2px;height:7px;background:#888;border-radius:1px"><span style="position:absolute;top:-5px;left:-2px;width:6px;height:6px;border-radius:50%;background:#888"></span></span>
-          <span style="position:relative;width:2px;height:7px;background:#888;border-radius:1px"><span style="position:absolute;top:-5px;left:-2px;width:6px;height:6px;border-radius:50%;background:#888"></span></span>
-        </span>
-        Talk to Jamila&nbsp;Bot™
-      </a>
-    </div>
-    <section id="askbot" style="display:none;margin:.7rem 0 0;max-width:620px">
-      <p style="color:#333;font-size:.95rem;margin:.4rem 0">
-        3 questions a day, sign in with GitHub and ask away…
-      </p>
-      <p style="color:#777;font-size:.82rem;font-style:italic;margin:.4rem 0 .8rem">
-        Thoughts generated by Maude and owned by Dystopic™.
-      </p>
-      <div id="askbot-body"></div>
-    </section>
-    <p class="tagline">Statistical inference &amp; computational methods for exoplanets</p>
+    <img class="portrait" src="headshot.jpeg" alt="Portrait of Jamila Taaki" />
+    <h1 class="name">Jamila Taaki</h1>
+    <p class="tagline">Signal processing for exoplanet detection and imaging</p>
     <p>
       I'm a postdoctoral researcher at
       <a href="https://www.stsci.edu/">STScI</a>, advised by
@@ -122,102 +61,6 @@
       <a class="btn" href="Jamila_CV.pdf">Download CV (PDF)</a>
       <a class="btn" href="research_statement.pdf">Research Statement (PDF)</a>
     </p>
-    <script>
-    (function () {
-      var BOT_API = "https://jamila-bot.vercel.app";
-      var openBtn = document.getElementById("askbot-open");
-      var section = document.getElementById("askbot");
-      var body = document.getElementById("askbot-body");
-
-      var m = location.hash.match(/token=([^&]+)/);
-      var fresh = false;
-      if (m) {
-        sessionStorage.setItem("askbot_token", m[1]);
-        history.replaceState(null, "", location.pathname + location.search);
-        fresh = true;
-      }
-
-      function el(tag, attrs, text) {
-        var e = document.createElement(tag);
-        for (var k in attrs || {}) e.setAttribute(k, attrs[k]);
-        if (text) e.textContent = text;
-        return e;
-      }
-
-      function render() {
-        body.innerHTML = "";
-        var token = sessionStorage.getItem("askbot_token");
-        if (!token) {
-          body.appendChild(el("a", {
-            href: BOT_API + "/api/auth/github",
-            class: "btn", style: "cursor:pointer",
-          }, "Sign in with GitHub to ask"));
-          return;
-        }
-        var form = el("form", { style: "display:flex;gap:.5rem;flex-wrap:wrap" });
-        var input = el("input", {
-          type: "text", maxlength: "1000",
-          placeholder: "e.g. How does astrometry break mapping degeneracies?",
-          style: "flex:1;min-width:240px;padding:.6rem;border:1px solid #aaa;font:inherit",
-        });
-        var btn = el("button", {
-          type: "submit", class: "btn",
-          style: "cursor:pointer;background:#fff;font:inherit",
-        }, "Ask");
-        var meta = el("div", { style: "color:#555;font-size:.85rem;margin:.4rem 0" });
-        var out = el("div", {
-          style: "white-space:pre-wrap;border:1px solid #eee;background:#fafafa;padding:.75rem;margin-top:.6rem;min-height:2rem;display:none",
-        });
-        form.appendChild(input); form.appendChild(btn);
-        body.appendChild(form); body.appendChild(meta); body.appendChild(out);
-        input.focus();
-
-        form.addEventListener("submit", async function (ev) {
-          ev.preventDefault();
-          var q = input.value.trim();
-          if (!q) return;
-          btn.disabled = true; out.style.display = "block"; out.textContent = "…";
-          try {
-            var res = await fetch(BOT_API + "/api/ask", {
-              method: "POST",
-              headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-              body: JSON.stringify({ question: q }),
-            });
-            if (res.status === 401) {
-              sessionStorage.removeItem("askbot_token");
-              out.textContent = "Session expired — sign in again.";
-              render();
-              return;
-            }
-            if (res.status === 429) {
-              var j = await res.json();
-              out.textContent = j.message || "Out of questions for today.";
-              meta.textContent = "";
-              return;
-            }
-            var rem = res.headers.get("X-Questions-Remaining");
-            if (rem !== null) meta.textContent = rem + " of 3 questions left today";
-            out.textContent = "";
-            var reader = res.body.getReader();
-            var dec = new TextDecoder();
-            for (;;) {
-              var chunk = await reader.read();
-              if (chunk.done) break;
-              out.textContent += dec.decode(chunk.value, { stream: true });
-            }
-          } catch (e) {
-            out.textContent = "Something went wrong — try again.";
-          } finally {
-            btn.disabled = false;
-          }
-        });
-      }
-
-      function open() { section.style.display = "block"; render(); }
-      openBtn.addEventListener("click", function (ev) { ev.preventDefault(); open(); });
-      if (fresh) open();
-    })();
-    </script>
   </header>
 
   <main class="container">
@@ -290,106 +133,63 @@
 
     <section id="projects">
       <h2>Projects / Software</h2>
-
-      <div class="project-grid">
-        <!-- Row 1: Astrometric Jitter Visualizer | PyStarshade -->
-        <figure class="project-card">
-          <img src="jittermap_thumb.gif" alt="jittermap animation: sunspot groups of Carrington rotation 2156 on a rotating star" />
-          <figcaption>
-            <h3>jittermap</h3>
-            <p>
-              Python library for stellar surface mapping: simulates photometry and astrometry for arbitrary or spotted stellar surfaces, and performs Bayesian inversion to recover surface maps and stellar inclination.
-            </p>
-            <p>
-              <a href="https://github.com/xiaziyna/jittermap" target="_blank">Code</a> ·
-              <a href="https://jittermap.readthedocs.io" target="_blank">Docs</a> ·
-              <a href="https://doi.org/10.3847/1538-4357/ae66f7" target="_blank">ApJ paper</a>
-            </p>
-          </figcaption>
-        </figure>
-
-        <figure class="project-card">
-          <img src="pystarshade_thumb.png" alt="Starshade pupil and PSF thumbnail" />
-          <figcaption>
-            <h3>PyStarshade</h3>
-            <p>
-              Python library for Fresnel diffraction simulations of starshades with realistic telescope apertures,
-              using Bluestein FFTs to move between varying spatial scales at optical planes and resolve high-resolution PSFs.
-            </p>
-            <p>
-              <a href="https://github.com/xiaziyna/PyStarshade" target="_blank">Code</a> ·
-              <a href="https://doi.org/10.21105/joss.07917" target="_blank">JOSS paper</a>
-            </p>
-          </figcaption>
-        </figure>
-
-        <!-- Row 2: Exoplanet of the Day | spatial-detrend -->
-        <figure class="project-card">
-          <img src="exoplanet_day_thumb.png" alt="Transit light curve still from exoplanet bot" />
-          <figcaption>
-            <h3>Exoplanet of the Day</h3>
-            <p>
-              Ode to the transit detection technique. Twitter/X bot that posts an animated transit light curve each day, using a real Kepler detection and light curve. Visualizes the transit to scale.
-            </p>
-            <p>
-              <a href="https://twitter.com/exoplanet_day" target="_blank">Bot</a> ·
-              <a href="https://github.com/xiaziyna/lightcurve-of-the-day" target="_blank">Code</a>
-            </p>
-          </figcaption>
-        </figure>
-        <figure class="project-card">
-          <img src="gakken_thumb.png" alt="Gakken WorldEye showing a stellar surface" />
-          <figcaption>
-            <h3>Reconstructing stars on my spherical Gakken screen</h3>
-            <p>
-              Tabletop demo of stellar-surface reconstruction on a Gakken display + Raspberry Pi for stellar surface reconstructions. Shown at Electronic Imaging 2026 and through the UMich NSF Science Communication Fellows program.
-            </p>
-            <p>
-              <a href="spherical_screen.html" target="_blank">Page &amp; video</a>
-            </p>
-          </figcaption>
-        </figure>
-        <figure class="project-card">
-          <img src="spatial_thumb.jpg" alt="Raw and detrended light curve panels" />
-          <figcaption>
-            <h3>spatial-detrend</h3>
-            <p>
-              Low-rank, spatial (sensor) detrending for missions like Kepler and TESS. Removing structured
-              detector systematics with a total variation prior while preserving astrophysical variability.
-            </p>
-            <p>
-              <a href="https://github.com/xiaziyna/spatial-detrend" target="_blank">Code</a>
-            </p>
-          </figcaption>
-        </figure>
-
-        <!-- Row 3: CUDA | TESS joint search -->
-        <figure class="project-card">
-          <img src="cuda_thumb.png" alt="GPU vs CPU performance plot thumbnail" />
-          <figcaption>
-            <h3>CUDA Transit Detection</h3>
-            <p>
-              Prototype GPU kernels for fast Bayesian transit likelihood ratio tests with full rank covariance models that account for both instrument systematics and stellar variability.
-            </p>
-            <p>
-              <a href="https://github.com/xiaziyna/CUDA-transit-detection" target="_blank">Code</a>
-            </p>
-          </figcaption>
-        </figure>
-
-        <figure class="project-card">
-          <figcaption>
-            <h3>TESS Joint Bayesian Transit Search</h3>
-            <p>
-              Large-scale joint transit search on TESS 2-minute light curves, run on a 250k node-hour Blue Waters
-              allocation. Read our successful proposal:
-            </p>
-            <p>
-              <a href="bw_proposal.pdf" target="_blank">Blue Waters proposal</a>
-            </p>
-          </figcaption>
-        </figure>
-
+      <div class="cards">
+        <article class="card">
+          <div class="frame"><img src="jittermap_thumb.gif" alt="jittermap animation: sunspot groups of Carrington rotation 2156 on a rotating star" loading="lazy"></div>
+          <div class="txt">
+            <h3><a href="projects/jittermap.html">jittermap</a></h3>
+            <p class="short">Stellar surface mapping from photometry and astrometry, with Bayesian inversion.</p>
+            <div class="foot"><span class="plinks"><a href="https://github.com/xiaziyna/jittermap" target="_blank" rel="noopener">Code</a></span><span class="more" aria-hidden="true">Details →</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="frame"><img src="pystarshade_thumb.png" alt="Starshade pupil and PSF thumbnail" loading="lazy"></div>
+          <div class="txt">
+            <h3><a href="projects/pystarshade.html">PyStarshade</a></h3>
+            <p class="short">Fresnel diffraction simulations of starshades with realistic telescope apertures.</p>
+            <div class="foot"><span class="plinks"><a href="https://github.com/xiaziyna/PyStarshade" target="_blank" rel="noopener">Code</a></span><span class="more" aria-hidden="true">Details →</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="frame"><img src="exoplanet_day_thumb.png" alt="Transit light curve still from exoplanet bot" loading="lazy"></div>
+          <div class="txt">
+            <h3><a href="projects/exoplanet-of-the-day.html">Exoplanet of the Day</a></h3>
+            <p class="short">A bot that posts an animated Kepler transit light curve every day.</p>
+            <div class="foot"><span class="plinks"><a href="https://twitter.com/exoplanet_day" target="_blank" rel="noopener">Bot</a></span><span class="more" aria-hidden="true">Details →</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="frame"><img src="gakken_thumb.png" alt="Gakken WorldEye showing a stellar surface" loading="lazy"></div>
+          <div class="txt">
+            <h3><a href="projects/spherical-gakken-screen.html">Spherical Gakken screen</a></h3>
+            <p class="short">Stellar-surface reconstructions shown on a tabletop spherical display.</p>
+            <div class="foot"><span class="plinks"><a href="spherical_screen.html">Page &amp; video</a></span><span class="more" aria-hidden="true">Details →</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="frame"><img src="spatial_thumb.jpg" alt="Raw and detrended light curve panels" loading="lazy"></div>
+          <div class="txt">
+            <h3><a href="projects/spatial-detrend.html">spatial-detrend</a></h3>
+            <p class="short">Low-rank spatial detrending of Kepler and TESS detector systematics.</p>
+            <div class="foot"><span class="plinks"><a href="https://github.com/xiaziyna/spatial-detrend" target="_blank" rel="noopener">Code</a></span><span class="more" aria-hidden="true">Details →</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="frame"><img src="cuda_thumb.png" alt="GPU vs CPU performance plot thumbnail" loading="lazy"></div>
+          <div class="txt">
+            <h3><a href="projects/cuda-transit-detection.html">CUDA Transit Detection</a></h3>
+            <p class="short">GPU kernels for Bayesian transit likelihood ratio tests.</p>
+            <div class="foot"><span class="plinks"><a href="https://github.com/xiaziyna/CUDA-transit-detection" target="_blank" rel="noopener">Code</a></span><span class="more" aria-hidden="true">Details →</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="frame"><div class="ph"><span><b>TESS</b>250k node-hours<br>Blue Waters</span></div></div>
+          <div class="txt">
+            <h3><a href="projects/tess-transit-search.html">TESS Joint Bayesian Transit Search</a></h3>
+            <p class="short">A joint transit search of TESS 2-minute light curves, run on Blue Waters.</p>
+            <div class="foot"><span class="plinks"><a href="bw_proposal.pdf">Blue Waters proposal</a></span><span class="more" aria-hidden="true">Details →</span></div>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -398,16 +198,7 @@
     <section id="media">
       <h2>Other</h2>
       <ul>
-        <li>
-          <a href="https://www.youtube.com/watch?v=oOqwSfjE3qA" target="_blank" rel="noopener">
-            Research interview (YouTube)
-          </a>
-        </li>
-        <li>
-          <a href="https://xiaziyna.github.io/rm_effect.html" target="_blank" rel="noopener">
-            Rossiter-Mclaughlin simulator
-          </a>
-        </li>
+        <li><a href="https://www.youtube.com/watch?v=oOqwSfjE3qA" target="_blank" rel="noopener">Research interview (YouTube)</a></li>
       </ul>
     </section>
 
@@ -421,5 +212,8 @@
       </p>
     </section>
   </main>
+</div>
+  <canvas id="lf-canvas" aria-hidden="true"></canvas>
+  <script src="assets/letterfall.js" defer></script>
 </body>
 </html>

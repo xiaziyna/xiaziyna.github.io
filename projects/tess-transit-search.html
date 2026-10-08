@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="canonical" href="https://xiaziyna.github.io/projects/tess-transit-search.html" />
+  <title>TESS Joint Bayesian Transit Search — Jamila Taaki</title>
+  <meta name="description" content="A joint transit search of TESS 2-minute light curves, run on Blue Waters." />
+  <script>
+    // Hide the page until the letter animation takes over (failsafe: always shown after 6 s).
+    (function () {
+      try {
+        var d = document.documentElement, s = window.sessionStorage;
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (s.getItem('lf-transfer')) { d.classList.add('lf-forming'); setTimeout(function () { d.classList.remove('lf-forming'); }, 6000); }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body data-page="project">
+<div id="site">
+  <nav class="topnav">
+    <div class="container">
+      <a href="../index.html"><strong>Jamila Taaki</strong></a>
+      <a href="../Jamila_CV.pdf">CV (PDF)</a>
+      <a href="../research_statement.pdf">Research Statement (PDF)</a>
+      <a href="../index.html#publications">Publications</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#media">Talks &amp; Media</a>
+      <a href="../index.html#contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="container projpage">
+    <p class="crumb"><a href="../index.html#projects">← All projects</a></p>
+    <h1>TESS Joint Bayesian Transit Search</h1>
+    <figure class="hero"><div class="ph"><span><b>TESS</b>250k node-hours<br>Blue Waters</span></div></figure>
+    <p class="lede">Large-scale joint transit search on TESS 2-minute light curves, run on a 250k node-hour Blue Waters allocation. Read our successful proposal:</p>
+    <p class="plinks"><a href="../bw_proposal.pdf">Blue Waters proposal</a></p>
+  </main>
+</div>
+  <canvas id="lf-canvas" aria-hidden="true"></canvas>
+  <script src="../assets/letterfall.js" defer></script>
+</body>
+</html>

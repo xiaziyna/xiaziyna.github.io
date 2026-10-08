@@ -4,19 +4,49 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
-
-
 <url>
   <loc>https://xiaziyna.github.io/</loc>
-  <lastmod>2021-07-21T18:20:04+00:00</lastmod>
+  <lastmod>2026-10-08T00:00:00+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://xiaziyna.github.io/bw_proposal.pdf</loc>
-  <lastmod>2021-07-21T18:20:04+00:00</lastmod>
+  <loc>https://xiaziyna.github.io/projects/cuda-transit-detection.html</loc>
+  <lastmod>2026-10-08T00:00:00+00:00</lastmod>
   <priority>0.80</priority>
 </url>
-
-
+<url>
+  <loc>https://xiaziyna.github.io/projects/exoplanet-of-the-day.html</loc>
+  <lastmod>2026-10-08T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://xiaziyna.github.io/projects/jittermap.html</loc>
+  <lastmod>2026-10-08T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://xiaziyna.github.io/projects/pystarshade.html</loc>
+  <lastmod>2026-10-08T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://xiaziyna.github.io/projects/spatial-detrend.html</loc>
+  <lastmod>2026-10-08T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://xiaziyna.github.io/projects/spherical-gakken-screen.html</loc>
+  <lastmod>2026-10-08T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://xiaziyna.github.io/projects/tess-transit-search.html</loc>
+  <lastmod>2026-10-08T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://xiaziyna.github.io/bw_proposal.pdf</loc>
+  <lastmod>2026-10-08T00:00:00+00:00</lastmod>
+  <priority>0.60</priority>
+</url>
 </urlset>
