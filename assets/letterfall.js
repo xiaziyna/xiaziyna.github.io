@@ -386,13 +386,7 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
   // ---------- project page: starlight held in a starshade, spares form the planet ----------
   let FS = 10, CW = 6, CH = 11, FFAM = 'sans-serif';
   const TL = { inStag: 0.4, inDur: 0.85, hold: 2.0, outStag: 0.6, outDur: 0.95 };
-  const SHADE_AREA = 0.637, SHADE_HUB = 0.467, PETALS = 24;
-  // angle of one petal tip in the outline; the struts run from the centre out along each petal's axis
-  const TIP0 = (() => {
-    let best = 0, bi = 0;
-    for (let i = 0; i < SHADE.length; i += 2) { const r = SHADE[i] * SHADE[i] + SHADE[i + 1] * SHADE[i + 1]; if (r > best) { best = r; bi = i; } }
-    return Math.atan2(SHADE[bi + 1], SHADE[bi]);
-  })();   // HWO 60 m outline: area / (pi R^2), hub radius / tip radius
+  const SHADE_AREA = 0.637, SHADE_HUB = 0.467;   // HWO 60 m outline: area / (pi R^2), hub radius / tip radius
   const fsprite = (ch, color) => sprite(ch, { font: `400 ${FS}px ${FFAM}`, size: FS, color });
   const snapX = x => FM.cx + Math.round((x - FM.cx) / CW) * CW;
   const snapY = y => FM.cy + Math.round((y - FM.cy) / CH) * CH;
@@ -450,24 +444,17 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
     for (let j = -ny; j <= ny; j++) for (let i = -nx; i <= nx; i++) pcells.push({ dx: i * CW, dy: j * CH });
     pcells.sort((u, v) => Math.hypot(u.dx, u.dy) - Math.hypot(v.dx, v.dy));
     planet.forEach((p, i) => { p.cell = pcells[i % pcells.length]; });
-    // inside the hub, letters sit on the radial struts that run from the centre out to each petal tip.
-    // They are placed at exact positions along each strut (not on the character grid, which is too coarse
-    // for 24 lines), starting a fifth of the way out where the struts would otherwise merge.
-    const cells = shadeMask(R), toPlanet = Math.atan2(FM.py - cy, FM.px - cx), seg = TAU / PETALS;
-    const struts = [];
-    for (let k = 0; k < PETALS; k++) {
-      const a = TIP0 + k * seg;
-      for (let s = 0.2 * R; s <= SHADE_HUB * R; s += CW * 1.15) struts.push({ dx: s * Math.cos(a), dy: s * Math.sin(a), strut: true, exact: true });
-    }
-    // fill the outline and the struts first, then the petals (leaning toward the planet). The hub between
-    // the struts stays empty so the struts read as lines; surplus letters double up on places already in use.
-    const usable = struts.concat(cells.filter(c => c.edge || Math.hypot(c.dx, c.dy) > SHADE_HUB * R));
-    usable.forEach(c => {
-      const lean = 1 + 0.7 * Math.cos(Math.atan2(c.dy, c.dx) - toPlanet);
-      c.k = (c.edge || c.strut ? 1 : 0) + Math.pow(Math.random(), 1 / lean);
+    // fill the outline first, then the petals, leaning toward the planet; the hub stays sparse
+    const cells = shadeMask(R), toPlanet = Math.atan2(FM.py - cy, FM.px - cx);
+    cells.forEach(c => {
+      const r = Math.hypot(c.dx, c.dy) / R;
+      let w = 1 + 0.7 * Math.cos(Math.atan2(c.dy, c.dx) - toPlanet);
+      w *= r > SHADE_HUB ? 3 : 0.5;
+      if (c.edge) w *= 8;
+      c.k = Math.pow(Math.random(), 1 / w);
     });
-    usable.sort((u, v) => v.k - u.k);
-    const chosen = usable.slice(0, Math.min(usable.length, starlight.length));
+    cells.sort((u, v) => v.k - u.k);
+    const chosen = cells.slice(0, Math.min(cells.length, starlight.length));
     starlight.sort((u, v) => Math.atan2(u.sy - cy, u.sx - cx) - Math.atan2(v.sy - cy, v.sx - cx));
     chosen.sort((u, v) => Math.atan2(u.dy, u.dx) - Math.atan2(v.dy, v.dx));
     starlight.forEach((p, i) => { p.cell = chosen[Math.floor(i * chosen.length / starlight.length)]; });
@@ -481,9 +468,8 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
   }
   function shadeLook(p, tt) {
     const a = FM.omega * tt, co = Math.cos(a), s = Math.sin(a), c = p.cell;
-    const al = c.edge || c.strut ? 0.95 : 0.3 + 0.22 * (0.5 + 0.5 * Math.sin(5 * tt + p.ph));   // suppressed starlight twinkles faintly
-    const x = FM.cx + c.dx * co - c.dy * s, y = FM.cy + c.dx * s + c.dy * co;
-    return { x: c.exact ? x : snapX(x), y: c.exact ? y : snapY(y), a: al, c: FM.col.ink };
+    const al = c.edge ? 0.95 : 0.3 + 0.22 * (0.5 + 0.5 * Math.sin(5 * tt + p.ph));   // suppressed starlight twinkles faintly
+    return { x: snapX(FM.cx + c.dx * co - c.dy * s), y: snapY(FM.cy + c.dx * s + c.dy * co), a: al, c: FM.col.ink };
   }
   function planetLook(p, tt) {
     const c = p.cell, nx = c.dx / FM.rp, ny = c.dy / FM.rp, nz = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
