@@ -11,15 +11,19 @@
   <meta name="description" content="Signal processing for exoplanet detection and imaging: transits, starshades, and astrometry." />
   <script>
     // Hide the page until the letter animation takes over (failsafe: always shown after 6 s).
-    // The galaxy plays on the first visit of a session and on every refresh.
+    // The galaxy plays on every visit and every refresh. It is skipped when coming back from a
+    // project page (by link or back/forward) and when arriving at a section link like #publications.
     (function () {
       try {
-        var d = document.documentElement, s = window.sessionStorage;
+        var d = document.documentElement;
         if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
-        var reload = nav ? nav.type === 'reload' : (performance.navigation && performance.navigation.type === 1);
-        if (reload && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
-        if (!s.getItem('lf-seen') || reload) { d.classList.add('lf-forming'); setTimeout(function () { d.classList.remove('lf-forming'); }, 6000); }
+        var type = nav ? nav.type : (performance.navigation && performance.navigation.type === 1 ? 'reload' : 'navigate');
+        var fromProject = false;
+        try { var r = new URL(document.referrer); fromProject = r.origin === location.origin && r.pathname.indexOf('/projects/') === 0; } catch (e) {}
+        var play = type === 'reload' || (type !== 'back_forward' && !fromProject && !location.hash);
+        if (type === 'reload' && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+        if (play) { d.classList.add('lf-forming'); setTimeout(function () { d.classList.remove('lf-forming'); }, 6000); }
       } catch (e) {}
     })();
   </script>
