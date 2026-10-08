@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="canonical" href="https://xiaziyna.github.io/projects/cuda-transit-detection.html" />
+  <title>CUDA Transit Detection — Jamila Taaki</title>
+  <meta name="description" content="GPU kernels for Bayesian transit likelihood ratio tests." />
+  <script>
+    // Hide the page until the letter animation takes over (failsafe: always shown after 6 s).
+    (function () {
+      try {
+        var d = document.documentElement, s = window.sessionStorage;
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (s.getItem('lf-transfer')) { d.classList.add('lf-forming'); setTimeout(function () { d.classList.remove('lf-forming'); }, 6000); }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body data-page="project">
+<div id="site">
+  <nav class="topnav">
+    <div class="container">
+      <a href="../index.html"><strong>Jamila Taaki</strong></a>
+      <a href="../Jamila_CV.pdf">CV (PDF)</a>
+      <a href="../research_statement.pdf">Research Statement (PDF)</a>
+      <a href="../index.html#publications">Publications</a>
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#media">Talks &amp; Media</a>
+      <a href="../index.html#contact">Contact</a>
+    </div>
+  </nav>
+
+  <main class="container projpage">
+    <p class="crumb"><a href="../index.html#projects">← All projects</a></p>
+    <h1>CUDA Transit Detection</h1>
+    <figure class="hero"><img src="../cuda_thumb.png" alt="GPU vs CPU performance plot thumbnail"></figure>
+    <p class="lede">Prototype GPU kernels for fast Bayesian transit likelihood ratio tests with full rank covariance models that account for both instrument systematics and stellar variability.</p>
+    <p class="plinks"><a href="https://github.com/xiaziyna/CUDA-transit-detection" target="_blank" rel="noopener">Code</a></p>
+  </main>
+</div>
+  <canvas id="lf-canvas" aria-hidden="true"></canvas>
+  <script src="../assets/letterfall.js" defer></script>
+</body>
+</html>
