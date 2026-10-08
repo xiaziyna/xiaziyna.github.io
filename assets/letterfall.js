@@ -546,10 +546,19 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
     loadPile();
     const forming = root.classList.contains('lf-forming');
     if (PAGE === 'home') {
-      // play once per visit, and not when arriving at a section link
-      if (!forming || location.hash) { showSite(false); draw(); return; }
+      // play on the first visit of a session and on every refresh, but not when arriving at a section link
+      const nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+      const reloaded = nav ? nav.type === 'reload' : false;
+      if (!forming || (location.hash && !reloaded)) { showSite(false); draw(); return; }
       store.set('lf-seen', 1);
+      // a refresh starts over from the top, even if the address still ends in #projects
+      if (reloaded && location.hash) history.replaceState(null, '', location.pathname + location.search);
       scrollTo(0, 0);
+      if (reloaded) {
+        // keep the top while the galaxy plays, then let the browser restore scroll positions as usual again
+        const restore = () => { if (busy) scrollTo(0, 0); if ('scrollRestoration' in history) history.scrollRestoration = 'auto'; };
+        if (document.readyState === 'complete') restore(); else addEventListener('load', restore, { once: true });
+      }
       const src = site.querySelector('.portrait');
       const pic = new Image();
       pic.src = src ? (src.currentSrc || src.src) : '';

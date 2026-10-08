@@ -11,11 +11,15 @@
   <meta name="description" content="Signal processing for exoplanet detection and imaging: transits, starshades, and astrometry." />
   <script>
     // Hide the page until the letter animation takes over (failsafe: always shown after 6 s).
+    // The galaxy plays on the first visit of a session and on every refresh.
     (function () {
       try {
         var d = document.documentElement, s = window.sessionStorage;
         if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        if (!s.getItem('lf-seen')) { d.classList.add('lf-forming'); setTimeout(function () { d.classList.remove('lf-forming'); }, 6000); }
+        var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+        var reload = nav ? nav.type === 'reload' : (performance.navigation && performance.navigation.type === 1);
+        if (reload && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+        if (!s.getItem('lf-seen') || reload) { d.classList.add('lf-forming'); setTimeout(function () { d.classList.remove('lf-forming'); }, 6000); }
       } catch (e) {}
     })();
   </script>
