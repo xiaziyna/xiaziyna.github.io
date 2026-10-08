@@ -467,16 +467,25 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
   }
 
   // ---------- loop ----------
+  // letters never rotate, so draw each straight into its rectangle (setting a transform per letter was the main cost)
   function blit(s, x, y, k, alpha) {
     if (alpha <= 0.004) return;
     ctx.globalAlpha = alpha;
-    ctx.setTransform(k * DPR, 0, 0, k * DPR, x * DPR, y * DPR);
-    ctx.drawImage(s.c, -s.pad - s.cw / 2, -s.pad - s.chh / 2, s.w, s.h);
+    const kd = k * DPR;
+    ctx.drawImage(s.c, x * DPR - (s.pad + s.cw / 2) * kd, y * DPR - (s.pad + s.chh / 2) * kd, s.w * kd, s.h * kd);
   }
   function draw() {
     clearCanvas();
     const pp = pilePos();
     for (const h of pile) blit(h.sp, pp.x + h.ox, pp.y + h.oy, PILE_K, 0.85);
+    // how many letters are on the pile
+    if (pile.length) {
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.globalAlpha = 1;
+      ctx.fillStyle = '#777'; ctx.font = '11px ui-monospace, Menlo, Consolas, monospace'; ctx.textAlign = 'center';
+      ctx.fillText(String(pile.length), pp.x, pp.y + 24);
+      ctx.textAlign = 'start';
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
     // letters fade out over the handover while the real page fades in beneath them
     const fade = handT < 0 ? 1 : Math.max(0, 1 - (t - handT) / HANDOVER);
     for (const p of parts) {
