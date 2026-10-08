@@ -176,15 +176,58 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
   // ---------- the pile: spare letters condensed on top of each other, bottom left ----------
   let pile = [];
   const PILE_K = 0.55, PILE_MAX = 900;
-  const pilePos = () => ({ x: 34, y: H - 40 });
-  const pileOffset = () => ({ ox: gauss() * 4, oy: gauss() * 3 });
+  const PILE_BOX = 140, PILE_X = 34, PILE_Y = 100;   // the pile's own canvas: bottom-left, PILE_BOX px square
+  const pilePos = () => ({ x: PILE_X, y: H - PILE_BOX + PILE_Y });
+  const pileOffset = () => ({ ox: clamp(gauss() * 5.5, -16, 16), oy: clamp(gauss() * 5.5, -16, 16) });
+  // each letter buzzes on its own small rhythm
+  const buzz = h => Object.assign(h, { f1: rand(5, 13), f2: rand(5, 13), p1: rand(0, TAU), p2: rand(0, TAU) });
   function addToPile(p) {
-    pile.push({ ch: p.ch, st: p.stA, sp: p.A, ...(p.off || pileOffset()) });
+    pile.push(buzz({ ch: p.ch, st: p.stA, sp: p.A, ...(p.off || pileOffset()) }));
     if (pile.length > PILE_MAX) pile.splice(0, pile.length - PILE_MAX);
+    startPile();
   }
   function loadPile() {
     const pp = pilePos();
-    pile = unpack(store.get('lf-pile')).map(g => ({ ch: g.ch, st: g.st, sp: g.sp, ox: g.x - pp.x, oy: g.y - pp.y }));
+    pile = unpack(store.get('lf-pile')).map(g => buzz({ ch: g.ch, st: g.st, sp: g.sp, ox: g.x - pp.x, oy: g.y - pp.y }));
+    startPile();
+  }
+  const pc = document.createElement('canvas');
+  pc.id = 'lf-pile';
+  pc.setAttribute('aria-hidden', 'true');
+  pc.style.cssText = `position:fixed;left:0;bottom:0;width:${PILE_BOX}px;height:${PILE_BOX}px;pointer-events:none;z-index:30`;
+  document.body.appendChild(pc);
+  const pctx = pc.getContext('2d');
+  let pileRunning = false, pileLast = 0;
+  function drawPile(now) {
+    const d = Math.round(PILE_BOX * DPR);
+    if (pc.width !== d) { pc.width = d; pc.height = d; }
+    pctx.setTransform(1, 0, 0, 1, 0, 0);
+    pctx.clearRect(0, 0, d, d);
+    if (!pile.length) return;
+    const tt = now / 1000, jit = reduce ? 0 : 1.7;
+    // a soft glow behind the ball, breathing slowly
+    const g = pctx.createRadialGradient(PILE_X * DPR, PILE_Y * DPR, 0, PILE_X * DPR, PILE_Y * DPR, (26 + Math.sqrt(pile.length) * 0.35) * DPR);
+    const a = reduce ? 0.22 : 0.2 + 0.08 * Math.sin(tt * 2.2);
+    g.addColorStop(0, `rgba(110, 150, 220, ${a.toFixed(3)})`);
+    g.addColorStop(1, 'rgba(110, 150, 220, 0)');
+    pctx.fillStyle = g;
+    pctx.fillRect(0, 0, d, d);
+    for (const h of pile) {
+      blitTo(pctx, h.sp, PILE_X + h.ox + jit * Math.sin(tt * h.f1 + h.p1), PILE_Y + h.oy + jit * Math.cos(tt * h.f2 + h.p2), PILE_K, 0.45);   // light ink, so overlaps shade the core
+    }
+    // how many letters are on the pile
+    pctx.setTransform(DPR, 0, 0, DPR, 0, 0); pctx.globalAlpha = 1;
+    pctx.fillStyle = '#777'; pctx.font = '11px ui-monospace, Menlo, Consolas, monospace'; pctx.textAlign = 'center';
+    pctx.fillText(String(pile.length), PILE_X, PILE_Y + 32);
+  }
+  function pileLoop(now) {
+    if (!pile.length) { pileRunning = false; drawPile(now); return; }
+    if (now - pileLast > 33) { pileLast = now; drawPile(now); }   // about 30 fps is plenty for a buzz
+    requestAnimationFrame(pileLoop);
+  }
+  function startPile() {
+    if (reduce) { drawPile(performance.now()); return; }
+    if (!pileRunning) { pileRunning = true; requestAnimationFrame(pileLoop); }
   }
   function savePile() {
     const pp = pilePos();
@@ -343,7 +386,13 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
   // ---------- project page: starlight held in a starshade, spares form the planet ----------
   let FS = 10, CW = 6, CH = 11, FFAM = 'sans-serif';
   const TL = { inStag: 0.4, inDur: 0.85, hold: 2.0, outStag: 0.6, outDur: 0.95 };
-  const SHADE_AREA = 0.637, SHADE_HUB = 0.467;   // HWO 60 m outline: area / (pi R^2), hub radius / tip radius
+  const SHADE_AREA = 0.637, SHADE_HUB = 0.467, PETALS = 24;
+  // angle of one petal tip in the outline; the struts run from the centre out along each petal's axis
+  const TIP0 = (() => {
+    let best = 0, bi = 0;
+    for (let i = 0; i < SHADE.length; i += 2) { const r = SHADE[i] * SHADE[i] + SHADE[i + 1] * SHADE[i + 1]; if (r > best) { best = r; bi = i; } }
+    return Math.atan2(SHADE[bi + 1], SHADE[bi]);
+  })();   // HWO 60 m outline: area / (pi R^2), hub radius / tip radius
   const fsprite = (ch, color) => sprite(ch, { font: `400 ${FS}px ${FFAM}`, size: FS, color });
   const snapX = x => FM.cx + Math.round((x - FM.cx) / CW) * CW;
   const snapY = y => FM.cy + Math.round((y - FM.cy) / CH) * CH;
@@ -401,17 +450,24 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
     for (let j = -ny; j <= ny; j++) for (let i = -nx; i <= nx; i++) pcells.push({ dx: i * CW, dy: j * CH });
     pcells.sort((u, v) => Math.hypot(u.dx, u.dy) - Math.hypot(v.dx, v.dy));
     planet.forEach((p, i) => { p.cell = pcells[i % pcells.length]; });
-    // fill the outline first, then the petals, leaning toward the planet; the hub stays sparse
-    const cells = shadeMask(R), toPlanet = Math.atan2(FM.py - cy, FM.px - cx);
-    cells.forEach(c => {
-      const r = Math.hypot(c.dx, c.dy) / R;
-      let w = 1 + 0.7 * Math.cos(Math.atan2(c.dy, c.dx) - toPlanet);
-      w *= r > SHADE_HUB ? 3 : 0.5;
-      if (c.edge) w *= 8;
-      c.k = Math.pow(Math.random(), 1 / w);
+    // inside the hub, letters sit on the radial struts that run from the centre out to each petal tip.
+    // They are placed at exact positions along each strut (not on the character grid, which is too coarse
+    // for 24 lines), starting a fifth of the way out where the struts would otherwise merge.
+    const cells = shadeMask(R), toPlanet = Math.atan2(FM.py - cy, FM.px - cx), seg = TAU / PETALS;
+    const struts = [];
+    for (let k = 0; k < PETALS; k++) {
+      const a = TIP0 + k * seg;
+      for (let s = 0.2 * R; s <= SHADE_HUB * R; s += CW * 1.15) struts.push({ dx: s * Math.cos(a), dy: s * Math.sin(a), strut: true, exact: true });
+    }
+    // fill the outline and the struts first, then the petals (leaning toward the planet). The hub between
+    // the struts stays empty so the struts read as lines; surplus letters double up on places already in use.
+    const usable = struts.concat(cells.filter(c => c.edge || Math.hypot(c.dx, c.dy) > SHADE_HUB * R));
+    usable.forEach(c => {
+      const lean = 1 + 0.7 * Math.cos(Math.atan2(c.dy, c.dx) - toPlanet);
+      c.k = (c.edge || c.strut ? 1 : 0) + Math.pow(Math.random(), 1 / lean);
     });
-    cells.sort((u, v) => v.k - u.k);
-    const chosen = cells.slice(0, Math.min(cells.length, starlight.length));
+    usable.sort((u, v) => v.k - u.k);
+    const chosen = usable.slice(0, Math.min(usable.length, starlight.length));
     starlight.sort((u, v) => Math.atan2(u.sy - cy, u.sx - cx) - Math.atan2(v.sy - cy, v.sx - cx));
     chosen.sort((u, v) => Math.atan2(u.dy, u.dx) - Math.atan2(v.dy, v.dx));
     starlight.forEach((p, i) => { p.cell = chosen[Math.floor(i * chosen.length / starlight.length)]; });
@@ -425,8 +481,9 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
   }
   function shadeLook(p, tt) {
     const a = FM.omega * tt, co = Math.cos(a), s = Math.sin(a), c = p.cell;
-    const al = c.edge ? 0.95 : 0.3 + 0.22 * (0.5 + 0.5 * Math.sin(5 * tt + p.ph));   // suppressed starlight twinkles faintly
-    return { x: snapX(FM.cx + c.dx * co - c.dy * s), y: snapY(FM.cy + c.dx * s + c.dy * co), a: al, c: FM.col.ink };
+    const al = c.edge || c.strut ? 0.95 : 0.3 + 0.22 * (0.5 + 0.5 * Math.sin(5 * tt + p.ph));   // suppressed starlight twinkles faintly
+    const x = FM.cx + c.dx * co - c.dy * s, y = FM.cy + c.dx * s + c.dy * co;
+    return { x: c.exact ? x : snapX(x), y: c.exact ? y : snapY(y), a: al, c: FM.col.ink };
   }
   function planetLook(p, tt) {
     const c = p.cell, nx = c.dx / FM.rp, ny = c.dy / FM.rp, nz = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
@@ -468,24 +525,16 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
 
   // ---------- loop ----------
   // letters never rotate, so draw each straight into its rectangle (setting a transform per letter was the main cost)
-  function blit(s, x, y, k, alpha) {
+  function blitTo(c, s, x, y, k, alpha) {
     if (alpha <= 0.004) return;
-    ctx.globalAlpha = alpha;
+    c.globalAlpha = alpha;
     const kd = k * DPR;
-    ctx.drawImage(s.c, x * DPR - (s.pad + s.cw / 2) * kd, y * DPR - (s.pad + s.chh / 2) * kd, s.w * kd, s.h * kd);
+    c.drawImage(s.c, x * DPR - (s.pad + s.cw / 2) * kd, y * DPR - (s.pad + s.chh / 2) * kd, s.w * kd, s.h * kd);
   }
+  const blit = (s, x, y, k, alpha) => blitTo(ctx, s, x, y, k, alpha);
   function draw() {
     clearCanvas();
-    const pp = pilePos();
-    for (const h of pile) blit(h.sp, pp.x + h.ox, pp.y + h.oy, PILE_K, 0.85);
-    // how many letters are on the pile
-    if (pile.length) {
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.globalAlpha = 1;
-      ctx.fillStyle = '#777'; ctx.font = '11px ui-monospace, Menlo, Consolas, monospace'; ctx.textAlign = 'center';
-      ctx.fillText(String(pile.length), pp.x, pp.y + 24);
-      ctx.textAlign = 'start';
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-    }
+    if (reduce) drawPile(performance.now());   // with reduced motion the pile is still, so redraw it with each change
     // letters fade out over the handover while the real page fades in beneath them
     const fade = handT < 0 ? 1 : Math.max(0, 1 - (t - handT) / HANDOVER);
     for (const p of parts) {
@@ -533,7 +582,7 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
   // ---------- leaving for a project page: hand the letters on screen to the next page ----------
   site.addEventListener('click', e => {
     const a = e.target.closest('.card h3 a');
-    if (!a || reduce || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (!a || !/^projects\//.test(a.getAttribute('href') || '') || reduce || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     finishNow();
     resize();
     store.set('lf-transfer', pack(measure(), { w: innerWidth, h: innerHeight, at: Date.now() }));
