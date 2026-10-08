@@ -535,7 +535,9 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
   ['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, () => finishNow(), { passive: true }));
   addEventListener('scroll', () => { if (parts.length && !busy) finishNow(); }, { passive: true });
   addEventListener('pointerdown', () => { if (busy) finishNow(); });
-  addEventListener('resize', () => { if (parts.length) finishNow(); resize(); draw(); });
+  // phone address bars change the height as they slide in and out: keep animating through that,
+  // and only skip to the end when the width changes (a real relayout)
+  addEventListener('resize', () => { if (parts.length && root.clientWidth !== W) finishNow(); resize(); draw(); });
   addEventListener('pagehide', () => { finishNow(); savePile(); });
   addEventListener('pageshow', e => { if (e.persisted) { resize(); loadPile(); draw(); } });
 
@@ -557,8 +559,9 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
     }
     const tr = store.get('lf-transfer');
     store.del('lf-transfer');
-    // only replay letters measured moments ago in a window of the same size (scrollbars may differ between pages)
-    const fresh = tr && Date.now() - tr.at < 15000 && Math.abs(tr.w - innerWidth) < 3 && Math.abs(tr.h - innerHeight) < 3;
+    // only replay letters measured moments ago in a window of the same width. The height is not compared:
+    // phone browsers show and hide the address bar as you scroll, so it often differs between the two pages.
+    const fresh = tr && Date.now() - tr.at < 15000 && Math.abs(tr.w - innerWidth) < 3;
     if (!forming || !fresh) { showSite(false); draw(); return; }
     scrollTo(0, 0);
     const old = unpack(tr);
