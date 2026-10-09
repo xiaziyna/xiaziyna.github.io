@@ -10,6 +10,7 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
 //  - Letters nobody needs collect in a pile in the bottom-left corner, kept for the session.
 // The real HTML is always underneath; any scroll, click or key press skips to it.
 (() => {
+  if (!window.LETTERFALL_ON) return;   // switched off in assets/letterfall-config.js
   const site = document.getElementById('site');
   const cvs = document.getElementById('lf-canvas');
   if (!site || !cvs) return;
