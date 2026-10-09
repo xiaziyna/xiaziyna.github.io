@@ -88,28 +88,22 @@ section { padding-bottom: 8px; scroll-margin-top: 56px; }
 
 /* ---------- transit menu: the bar is a light curve starting at a small star ---------- */
 .topnav.transit { z-index: 40; border-bottom: 0; }   /* above the letter animation, which passes underneath */
-.topnav.transit .container { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 18px; align-items: center; padding-block: 4px 2px; }
-.tn-home { grid-column: 1; }
-.tn-curve { position: relative; height: 50px; min-width: 0; grid-column: 2; }
-.topnav.transit:not(:has(.tn-home)) .tn-curve { grid-column: 1 / 3; }
+.topnav.transit .container { display: block; padding-block: 6px 4px; }
+.tn-curve { position: relative; height: 86px; }
 .tn-lc { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.tn-line { fill: none; stroke: var(--link); stroke-width: 1.6; }
-.tn-pt { fill: var(--link); opacity: 0.35; }
-.tn-dot { fill: var(--ink); stroke: var(--paper); stroke-width: 2; }
+.tn-line { fill: none; stroke: var(--link); stroke-width: 2.2; stroke-linejoin: round; }
+.tn-pt { fill: var(--link); opacity: 0.32; }
+.tn-tick { stroke: var(--line); stroke-width: 1; }
+.tn-dot { fill: var(--ink); stroke: var(--paper); stroke-width: 2.5; }
 .tn-planet { fill: var(--ink); }
-#site .topnav .tn-curve a { position: absolute; top: 2px; transform: translateX(-50%); white-space: nowrap; font-size: 14px; color: var(--soft); padding: 1px 4px; }
+#site .topnav .tn-curve a { position: absolute; top: 4px; transform: translateX(-50%); white-space: nowrap; font-size: 17px; color: var(--soft); padding: 2px 6px; }
 #site .topnav .tn-curve a:hover { color: var(--ink); text-decoration: none; }
 #site .topnav .tn-curve a[aria-current] { color: var(--ink); font-weight: 600; }
 .tn-curve .s { display: none; }
 .tn-short .tn-curve .l { display: none; }
 .tn-short .tn-curve .s { display: inline; }
-.tn-docs { display: flex; gap: 14px; font-size: 14px; white-space: nowrap; grid-column: 3; }
-@media (max-width: 700px) {
-  .topnav.transit .container { grid-template-columns: minmax(0, 1fr); }
-  .tn-home, .tn-curve, .topnav.transit:not(:has(.tn-home)) .tn-curve, .tn-docs { grid-column: 1; }
-  .tn-docs { justify-content: flex-end; font-size: 13px; }
-  .tn-curve .l { display: none; }
-  .tn-curve .s { display: inline; }
-  #site .topnav .tn-curve a { font-size: 13px; }
+@media (max-width: 600px) {
+  .tn-curve { height: 74px; }
+  #site .topnav .tn-curve a { font-size: 14px; }
 }
-section, .header { scroll-margin-top: 72px; }
+section, .header { scroll-margin-top: 104px; }

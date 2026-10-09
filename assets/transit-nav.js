@@ -9,7 +9,8 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const NS = 'http://www.w3.org/2000/svg';
   const INGRESS = [0.18, 0.28], EGRESS = [0.72, 0.82];
-  const R = 11, FLAT = 33, DIP = 11;   // star radius, height of the out-of-transit line, depth of the dip (px)
+  const SMALL = () => curve.clientWidth < 560;
+  let R = 18, FLAT = 56, DIP = 20;   // star radius, height of the out-of-transit line, depth of the dip (px)
 
   // the transit shape: flat, a smooth ingress, a slightly limb-darkened bottom, a smooth egress
   function dip(u) {
@@ -25,8 +26,9 @@
 
   function draw() {
     W = curve.clientWidth;
-    x0 = 2 * R; x1 = W - 6;   // the line begins exactly at the star's edge
-    svg.setAttribute('viewBox', `0 0 ${W} 50`);
+    if (SMALL()) { R = 14; FLAT = 48; DIP = 16; } else { R = 18; FLAT = 56; DIP = 20; }
+    x0 = 2 * R; x1 = W - 4;   // the line begins exactly at the star's edge
+    svg.setAttribute('viewBox', `0 0 ${W} ${curve.clientHeight}`);
     svg.replaceChildren();
     const defs = el('defs', {});
     const grad = el('radialGradient', { id: 'tn-limb', cx: '0.5', cy: '0.5', r: '0.5' });
@@ -37,19 +39,21 @@
     // a few scattered measurements in the line's colour
     let seed = 7;
     const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
-    for (let i = 0; i < 38; i++) {
+    for (let i = 0; i < 44; i++) {
       const u = 0.02 + rnd() * 0.96;
-      svg.appendChild(el('circle', { cx: X(u).toFixed(1), cy: (Y(u) + (rnd() - 0.5) * 9).toFixed(1), r: 1.3, class: 'tn-pt' }));
+      svg.appendChild(el('circle', { cx: X(u).toFixed(1), cy: (Y(u) + (rnd() - 0.5) * 12).toFixed(1), r: 1.6, class: 'tn-pt' }));
     }
+    // a faint guide from each label down to its point on the curve
+    links.forEach(l => svg.appendChild(el('line', { x1: X(l.x), x2: X(l.x), y1: 28, y2: Y(l.x) - 8, class: 'tn-tick' })));
     let d = '';
     for (let i = 0; i <= 240; i++) { const u = i / 240; d += (i ? ' L' : 'M') + X(u).toFixed(1) + ' ' + Y(u).toFixed(2); }
     svg.appendChild(el('path', { d, class: 'tn-line' }));
     svg.appendChild(el('circle', { cx: R, cy: FLAT, r: R, fill: 'url(#tn-limb)' }));
     // the planet crossing the star's face, in step with the dip
     const g = el('g', { 'clip-path': 'url(#tn-disc)' });
-    onStar = el('circle', { cy: FLAT + 1, r: 3.6, class: 'tn-planet' });
+    onStar = el('circle', { cy: FLAT + 2, r: R * 0.32, class: 'tn-planet' });
     g.appendChild(onStar); svg.appendChild(g);
-    dot = el('circle', { r: 4.6, class: 'tn-dot' });
+    dot = el('circle', { r: 7, class: 'tn-dot' });
     svg.appendChild(dot);
     links.forEach(l => { l.a.style.left = X(l.x) + 'px'; });
     // use the short labels when the long ones would bump into each other
@@ -63,8 +67,15 @@
   function place() {
     if (!dot) return;
     dot.setAttribute('cx', X(u).toFixed(1)); dot.setAttribute('cy', Y(u).toFixed(2));
-    const across = (u - INGRESS[0]) / (EGRESS[1] - INGRESS[0]);
-    onStar.setAttribute('cx', (-4 + across * (2 * R + 8)).toFixed(1));
+    // the planet crosses the star's face in step with the dip: over the limb during ingress and egress,
+    // fully on the disc along the bottom
+    const pr = R * 0.32, inner = 0.4 * R, outer = 1.6 * R;
+    let px = null;
+    if (u > INGRESS[0] && u < INGRESS[1]) px = -pr + (inner + pr) * (u - INGRESS[0]) / (INGRESS[1] - INGRESS[0]);
+    else if (u >= INGRESS[1] && u <= EGRESS[0]) px = inner + (outer - inner) * (u - INGRESS[1]) / (EGRESS[0] - INGRESS[1]);
+    else if (u > EGRESS[0] && u < EGRESS[1]) px = outer + (2 * R + pr - outer) * (u - EGRESS[0]) / (EGRESS[1] - EGRESS[0]);
+    onStar.style.display = px === null ? 'none' : '';
+    if (px !== null) onStar.setAttribute('cx', px.toFixed(1));
     // the label nearest the planet is the current one
     let best = links[0];
     for (const l of links) if (Math.abs(l.x - u) < Math.abs(best.x - u)) best = l;
