@@ -20,15 +20,21 @@
 </head>
 <body data-page="project">
 <div id="site">
-  <nav class="topnav">
-    <div class="container">
-      <a href="../index.html"><strong>Jamila Taaki</strong></a>
-      <a href="../Jamila_CV.pdf">CV (PDF)</a>
-      <a href="../research_statement.pdf">Research Statement (PDF)</a>
-      <a href="../index.html#publications">Publications</a>
-      <a href="../index.html#projects">Projects</a>
-      <a href="../index.html#media">Talks &amp; Media</a>
-      <a href="../index.html#contact">Contact</a>
+  <nav class="topnav transit" aria-label="Site" data-current="projects">
+    <div class="container tn">
+      <a class="tn-home" href="../index.html"><strong>Jamila Taaki</strong></a>
+      <div class="tn-curve">
+        <svg class="tn-lc" aria-hidden="true"></svg>
+        <a href="../index.html#about" data-x="0.06"><span class="l">About</span><span class="s">About</span></a>
+        <a href="../index.html#publications" data-x="0.3"><span class="l">Publications</span><span class="s">Papers</span></a>
+        <a href="../index.html#projects" data-x="0.5"><span class="l">Projects</span><span class="s">Projects</span></a>
+        <a href="../index.html#media" data-x="0.7"><span class="l">Talks &amp; Media</span><span class="s">Media</span></a>
+        <a href="../index.html#contact" data-x="0.94"><span class="l">Contact</span><span class="s">Contact</span></a>
+      </div>
+      <div class="tn-docs">
+        <a href="../Jamila_CV.pdf"><strong>CV (PDF)</strong></a>
+        <a href="../research_statement.pdf">Research statement</a>
+      </div>
     </div>
   </nav>
 
@@ -41,6 +47,7 @@
   </main>
 </div>
   <canvas id="lf-canvas" aria-hidden="true"></canvas>
+  <script src="../assets/transit-nav.js" defer></script>
   <script src="../assets/letterfall.js" defer></script>
 </body>
 </html>

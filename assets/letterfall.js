@@ -72,6 +72,7 @@ const SHADE=[0.4629,0.0609,0.4764,0.0627,0.4899,0.0644,0.5034,0.0662,0.5169,0.06
     let node;
     while ((node = walker.nextNode())) {
       const el = node.parentElement;
+      if (el.closest('.topnav')) continue;   // the menu bar is not part of the animation
       let st = styles.get(el);
       if (!st) {
         const cs = getComputedStyle(el);
