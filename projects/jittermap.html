@@ -6,10 +6,12 @@
   <link rel="canonical" href="https://xiaziyna.github.io/projects/jittermap.html" />
   <title>jittermap — Jamila Taaki</title>
   <meta name="description" content="Stellar surface mapping from photometry and astrometry, with Bayesian inversion." />
+  <script src="../assets/letterfall-config.js"></script>
   <script>
     // Hide the page until the letter animation takes over (failsafe: always shown after 6 s).
     (function () {
       try {
+        if (!window.LETTERFALL_ON) return;   // animations switched off in assets/letterfall-config.js
         var d = document.documentElement, s = window.sessionStorage;
         if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         if (s.getItem('lf-transfer')) { d.classList.add('lf-forming'); setTimeout(function () { d.classList.remove('lf-forming'); }, 6000); }

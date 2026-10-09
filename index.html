@@ -9,12 +9,14 @@
   <meta property="og:image" content="headshot.jpeg" />
   <title>Jamila Taaki — Astrophysics &amp; Signal Processing</title>
   <meta name="description" content="Signal processing for exoplanet detection and imaging: transits, starshades, and astrometry." />
+  <script src="assets/letterfall-config.js"></script>
   <script>
     // Hide the page until the letter animation takes over (failsafe: always shown after 6 s).
     // The galaxy plays on every visit and every refresh. It is skipped when coming back from a
     // project page (by link or back/forward) and when arriving at a section link like #publications.
     (function () {
       try {
+        if (!window.LETTERFALL_ON) return;   // animations switched off in assets/letterfall-config.js
         var d = document.documentElement;
         if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
