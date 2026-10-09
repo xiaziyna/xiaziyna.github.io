@@ -10,7 +10,7 @@
   const NS = 'http://www.w3.org/2000/svg';
   const INGRESS = [0.18, 0.28], EGRESS = [0.72, 0.82];
   const SMALL = () => curve.clientWidth < 560;
-  let R = 18, FLAT = 56, DIP = 20;   // star radius, height of the out-of-transit line, depth of the dip (px)
+  let R = 30, FLAT = 62, DIP = 30;   // star radius, height of the out-of-transit line, depth of the dip (px)
 
   // the transit shape: flat, a smooth ingress, a slightly limb-darkened bottom, a smooth egress
   function dip(u) {
@@ -26,7 +26,7 @@
 
   function draw() {
     W = curve.clientWidth;
-    if (SMALL()) { R = 14; FLAT = 48; DIP = 16; } else { R = 18; FLAT = 56; DIP = 20; }
+    if (SMALL()) { R = 20; FLAT = 50; DIP = 22; } else { R = 30; FLAT = 62; DIP = 30; }
     x0 = 2 * R; x1 = W - 4;   // the line begins exactly at the star's edge
     svg.setAttribute('viewBox', `0 0 ${W} ${curve.clientHeight}`);
     svg.replaceChildren();
@@ -41,7 +41,7 @@
     const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
     for (let i = 0; i < 44; i++) {
       const u = 0.02 + rnd() * 0.96;
-      svg.appendChild(el('circle', { cx: X(u).toFixed(1), cy: (Y(u) + (rnd() - 0.5) * 12).toFixed(1), r: 1.6, class: 'tn-pt' }));
+      svg.appendChild(el('circle', { cx: X(u).toFixed(1), cy: (Y(u) + (rnd() - 0.5) * 14).toFixed(1), r: 1.7, class: 'tn-pt' }));
     }
     // a faint guide from each label down to its point on the curve
     links.forEach(l => svg.appendChild(el('line', { x1: X(l.x), x2: X(l.x), y1: 28, y2: Y(l.x) - 8, class: 'tn-tick' })));
