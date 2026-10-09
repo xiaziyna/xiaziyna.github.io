@@ -20,6 +20,7 @@
     return 0.9 * f * f * (3 - 2 * f);
   }
   let W = 0, x0 = 0, x1 = 0;
+  const planetR = () => Math.round(R * 0.2);
   const X = u => x0 + u * (x1 - x0), Y = u => FLAT + DIP * dip(u);
   const el = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
   let dot, onStar;
@@ -44,9 +45,11 @@
     svg.appendChild(el('circle', { cx: R, cy: FLAT, r: R, fill: 'url(#tn-limb)' }));
     // the planet crossing the star's face, in step with the dip
     const g = el('g', { 'clip-path': 'url(#tn-disc)' });
-    onStar = el('circle', { cy: FLAT + 2, r: R * 0.32, class: 'tn-planet' });
+    // the spot on the star is the same planet as the dot on the curve: same size, same colour
+    const PR = planetR();
+    onStar = el('circle', { cy: FLAT, r: PR, class: 'tn-planet' });
     g.appendChild(onStar); svg.appendChild(g);
-    dot = el('circle', { r: 7, class: 'tn-dot' });
+    dot = el('circle', { r: PR, class: 'tn-dot' });
     svg.appendChild(dot);
     links.forEach(l => { l.a.style.left = X(l.x) + 'px'; });
     // use the short labels when the long ones would bump into each other
@@ -62,7 +65,7 @@
     dot.setAttribute('cx', X(u).toFixed(1)); dot.setAttribute('cy', Y(u).toFixed(2));
     // the planet crosses the star's face in step with the dip: over the limb during ingress and egress,
     // fully on the disc along the bottom
-    const pr = R * 0.32, inner = 0.4 * R, outer = 1.6 * R;
+    const pr = planetR(), inner = 0.4 * R, outer = 1.6 * R;
     let px = null;
     if (u > INGRESS[0] && u < INGRESS[1]) px = -pr + (inner + pr) * (u - INGRESS[0]) / (INGRESS[1] - INGRESS[0]);
     else if (u >= INGRESS[1] && u <= EGRESS[0]) px = inner + (outer - inner) * (u - INGRESS[1]) / (EGRESS[0] - INGRESS[1]);
