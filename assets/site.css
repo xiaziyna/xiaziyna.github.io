@@ -89,7 +89,7 @@ section { padding-bottom: 8px; scroll-margin-top: 56px; }
 /* ---------- transit menu: the bar is a light curve starting at a small star ---------- */
 .topnav.transit { z-index: 40; border-bottom: 0; }   /* above the letter animation, which passes underneath */
 .topnav.transit .container { display: block; padding-block: 6px 4px; }
-.tn-curve { position: relative; height: 86px; }
+.tn-curve { position: relative; height: 102px; }
 .tn-lc { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .tn-line { fill: none; stroke: var(--link); stroke-width: 2.2; stroke-linejoin: round; }
 .tn-pt { fill: var(--link); opacity: 0.32; }
@@ -103,7 +103,7 @@ section { padding-bottom: 8px; scroll-margin-top: 56px; }
 .tn-short .tn-curve .l { display: none; }
 .tn-short .tn-curve .s { display: inline; }
 @media (max-width: 600px) {
-  .tn-curve { height: 74px; }
+  .tn-curve { height: 82px; }
   #site .topnav .tn-curve a { font-size: 14px; }
 }
-section, .header { scroll-margin-top: 104px; }
+section, .header { scroll-margin-top: 122px; }
